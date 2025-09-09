@@ -5,6 +5,7 @@
 config.ini
 TODO
 work_dir
+x*.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

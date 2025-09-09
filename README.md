@@ -1,8 +1,13 @@
-# **stonk_cli**
+# **stonk_app**
 
 ## **Introduction**
 
-Comand line interface for downloading stock market charts, heatmaps, and OHLC price data.
+Comand line interface for:
+- Downloading
+  - stock market charts
+  - S&P heatmaps
+  - OHLC price data
+- Backtesting trade strategies
 
 ## **Installation**
 

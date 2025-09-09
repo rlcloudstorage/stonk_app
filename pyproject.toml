@@ -3,13 +3,13 @@ requires = ["setuptools>=80.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "stonk_cli"
+name = "stonk_app"
 version = "0.1.0"
-description = "Download stockmarket charts, data, and heatmaps"
+description = "stockmarket data tools"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
-keywords = ["stockmarket",]
+keywords = ["stockmarket", "technical analysis"]
 authors = [
   {name = "A. Random Developer", email = "author@example.com"}
 ]
@@ -33,25 +33,24 @@ classifiers = [
   # Specify the Python versions you support here. In particular, ensure
   # that you indicate you support Python 3. These classifiers are *not*
   # checked by "pip install". See instead "requires-python" key in this file.
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3 :: Only",
 ]
-dependencies = ["click", "pillow", "python-dotenv", "scikit-learn", "selenium", "tiingo", "yfinance",]
+#dependencies = ["pillow", "python-dotenv", "scikit-learn", "selenium", "tiingo", "yfinance"]
+dependencies = ["click", "python-dotenv", "tiingo", "yfinance"]
 
 [project.optional-dependencies]
 # List additional groups of dependencies here (e.g. development
 # dependencies). Users will be able to install these using the "extras"
 # syntax, for example:
 #   $ pip install sampleproject[dev]
-dev = ["black", "coverage", "pytest",]
+dev = ["black", "coverage", "flake8", "pytest"]
 
 [project.urls]
-"Source" = "https://github.com/rlcloudstorage/stonk_cli"
+"Source" = "https://github.com/rlcloudstorage/stonk_app"
 
 [project.scripts]
-stonk_cli = "pkg:run_cli"
+stonk_app = "pkg:run_cli"
 
 [tool.setuptools]
 # If there are data files included in your packages that need to be
@@ -61,7 +60,8 @@ stonk_cli = "pkg:run_cli"
 
 [tool.black]
 line-length = 120
-target-version = ['py310']
+target-version = ['py3']
+#target-version = ['py311']
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
