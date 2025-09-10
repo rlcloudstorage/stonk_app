@@ -104,4 +104,5 @@ def run_cli():
     """see 'pyproject.toml' - entry point for CLI"""
     from .cli import main_console
 
-    main_console.start_cli(ctx=config_dict)
+    # main_console.start_cli()
+    main_console.cli()

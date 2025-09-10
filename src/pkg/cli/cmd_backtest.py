@@ -1,73 +1,61 @@
-"""src/pkg/cli/cmd_backtest.py"""
+"""src/pkg/cli/cmd_backtest.py\n
+def backtest():
+"""
 
-import argparse, logging
+import logging
 
-from os import path
+# from os import path
 
+import click
 
 from pkg import DEBUG
-from pkg.backtest_srv import client
+from pkg.srv_backtest import client
 
 
 logger = logging.getLogger(__name__)
 
 
-# def cli(ctx, parser):
-def cli(ctx, args):
+@click.command(
+    name="backtest",
+    short_help="Backtest trading strategy",
+    help="""
+\b
+NAME
+    backtest - Backtest stockmarket trading strategy
+\b
+DESCRIPTION
+    Run backtest on a saved strategy against historical data from the
+    stock OHLC database. Optional 'plot' can be specified as the first
+    argument if plotting the backtest output is desired. File locations
+    for database and strategy must exist in users work directory.
+"""
+)
+@click.argument(
+    "arguments", nargs=-1, default=None, required=False, type=str
+)
+@click.option(
+    "-db", "--database", "opt_trans",
+    default=None,
+    type=click.STRING,
+    nargs=1,
+    expose_value=True,
+    flag_value="database",
+    multiple=True,
+    help="Set database used for backtesting.",
+)
+@click.option(
+    "-s", "--strategy", "opt_trans",
+    flag_value="strategy",
+    multiple=True,
+    help="Strategy to use for backtesting."
+)
+
+@click.pass_context
+# @click.pass_obj
+def backtest(ctx, arguments, opt_trans):
     """Run backtest command"""
     if DEBUG:
-        # logger.debug(f"start_cli(ctx={ctx}, parser={parser})")
-        logger.debug(f"start_cli(ctx={ctx}, args={args})")
-
-    # parser = subparsers.add_parser("backtest", help="backtest trading strategies")
-    # parser.add_argument("-d", "--database", default="", help="set database used for backtesting", metavar="")
-    # parser.add_argument("-s", "--strategy", help="strategy to use for backtesting", metavar="")
-    # print(f"*** parser.parse_args(): {parser.parse_args()}")
-
-# =======
-
-# @click.command(
-#     "backtest",
-#     options_metavar='[plot] [OPTION]',
-#     short_help="Backtest trading strategy",
-#     help="""
-# \b
-# NAME
-#     backtest - Backtest stockmarket trading strategy
-# \b
-# DESCRIPTION
-#     Run backtest on a saved strategy against historical data from the
-#     stock OHLC database. Optional 'plot' can be specified as the first
-#     argument if plotting the backtest output is desired. File locations
-#     for database and strategy must exist in users work directory.
-# """
-# )
-# @click.argument(
-#     "argument", nargs=-1, default=None, required=False, type=str
-# )
-# @click.option(
-#     "-db", "--database", "opt_trans",
-#     default=None,
-#     type=click.STRING,
-#     nargs=1,
-#     expose_value=True,
-#     flag_value="database",
-#     multiple=True,
-#     help="Set database used for backtesting.",
-# )
-# @click.option(
-#     "-s", "--strategy", "opt_trans",
-#     flag_value="strategy",
-#     multiple=True,
-#     help="Strategy to use for backtesting."
-# )
-
-# # @click.pass_context
-# @click.pass_obj
-# def cli(ctx, argument, opt_trans):
-#     """Run backtest command"""
-#     if DEBUG:
-#         logger.debug(f"start_cli(ctx={type(ctx)}, arguments={argument}, opt_trans={opt_trans})")
+        logger.debug(f"start_cli(ctx={ctx.obj} {type(ctx)}, arguments={arguments}, opt_trans={opt_trans})")
 
 #     ctx["interface"]["command"] = "backtest"
 #     ctx["interface"]["plot"] = False
