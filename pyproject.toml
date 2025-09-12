@@ -3,7 +3,7 @@ requires = ["setuptools>=80.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "stonk_app"
+name = "stonk-app"
 version = "0.1.0"
 description = "stockmarket data tools"
 readme = "README.md"
@@ -50,7 +50,7 @@ dev = ["black", "coverage", "flake8", "pytest"]
 "Source" = "https://github.com/rlcloudstorage/stonk_app"
 
 [project.scripts]
-stonk_app = "pkg:run_cli"
+stonk-app = "pkg:start_cli"
 
 [tool.setuptools]
 # If there are data files included in your packages that need to be

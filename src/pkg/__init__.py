@@ -23,12 +23,12 @@ with open(f"{root_dir}/pyproject.toml", "rb") as f:
 os.makedirs(os.path.join(root_dir, "work_dir"), exist_ok=True)
 
 # work_dir = os.path.join(root_dir, "work_dir/")
-pkg_dir = os.path.join(root_dir, "src/pkg")
+# pkg_dir = os.path.join(root_dir, "src/pkg")
 config_file = os.path.join(src_dir, "config.ini")
 logger_conf = os.path.join(src_dir, "logger.ini")
 
 logging.config.fileConfig(fname=logger_conf)
-logger = logging.getLogger(f"  === Starting stonk_cli app - src/{__name__}/__init__.py ===")
+logger = logging.getLogger(f"  === Starting stonk-cli app - src/{__name__}/__init__.py ===")
 
 # Create getlist() converter, used for reading ticker symbols
 config_obj = ConfigParser(
@@ -57,7 +57,7 @@ except Exception as e:
 config_obj.read(config_file)
 
 # Gather config files from other apps
-for root, dirs, files in os.walk(pkg_dir):
+for root, dirs, files in os.walk(os.path.join(root_dir, "src/pkg")):
     for filename in files:
         if filename.startswith("cfg_") and filename.endswith(".ini"):
 
@@ -93,16 +93,14 @@ if DEBUG:
     root_dir: {root_dir}
     src_dir: {src_dir}
     work_dir: {config_dict["default"]["work_dir"]}
-    pkg_dir: {pkg_dir}
     logger_conf: {logger_conf}
     config_file: {config_file}
     config_dict: {config_dict}
 """)
 
 # Start user interface
-def run_cli():
-    """see 'pyproject.toml' - entry point for CLI"""
-    from .cli import main_console
+def start_cli():
+    """pyproject.toml entry point for CLI"""
+    from . import main_cli
 
-    # main_console.start_cli()
-    main_console.cli()
+    main_cli.group()
