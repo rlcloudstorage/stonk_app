@@ -17,14 +17,13 @@ def test_main_cli_group(runner):
     assert "data" in result.output
     assert result.exit_code == 0
 
-def test_main_cli_config(runner):
-    """test --work-dir with/without argument"""
+def test_main_cli_config_work_dir(runner):
+    # test --work-dir option without argument
     result = runner.invoke(group, ["config", "--work-dir"])
     assert "current" in result.output
     assert result.exit_code == 0
-
-    result = runner.invoke(group, ["config", "--work-dir", "argument"], input="y")
-    assert "argument" in result.output
-    assert result.exit_code == 0
+    # test --work-dir option with argument and abort
+    result = runner.invoke(group, ["config", "--work-dir", "new_dir"], input="N")
+    assert result.exit_code == 1
 
     # print(f"result.output: {result.output}")

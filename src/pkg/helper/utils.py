@@ -12,7 +12,7 @@ def print_okay(msg: str)->None:
     print(f"okay: {msg}")
 
 
-def write_config_file(ctx: object, key: str)->None:
+def write_config_file(ctx: object, option: str)->None:
     """
     Write new value to the appropriate config file
     ----------------------------------------------
@@ -26,15 +26,15 @@ def write_config_file(ctx: object, key: str)->None:
 
     if ctx.obj["debug"]:
         logger.debug(
-            # f"write_config_file(ctx={ctx}, key={key})"
-            f"write_config_file(ctx.__dict__={ctx.__dict__}, key={key})"
+            f"write_config_file(ctx={ctx}, option={option})"
+            # f"write_config_file(ctx.__dict__={ctx.__dict__}, key={key})"
         )
-    match key:
+    match option:
         case "work_dir":
             config_obj = ConfigParser()
             try:
                 config_obj.read(ctx.obj["config_file"])
-                config_obj.set(section="default", option=key, value=ctx.params[key])
+                config_obj.set(section="default", option=option, value=ctx.params[option])
             except Exception as e:
                 print(e)
 

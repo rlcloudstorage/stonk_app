@@ -53,26 +53,26 @@ def config(ctx, dummy, work_dir):
             f" config(ctx={ctx})\n"
             f" - ctx.parent: {ctx.parent}\n"
             f" - ctx.command: {ctx.command}\n"
-            f" - ctx.info_name: {ctx.info_name}\n"
-            f" - ctx.params: {ctx.params}\n"
-            f" - ctx.args: {ctx.args}\n"
+            f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
+            f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
+            f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
             f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
-            f" - ctx.default_map: {ctx.default_map}"
+            f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}"
         )
     # iterate over options in ctx.params dict
-    for key in ctx.params.keys():
-        match key:
+    for option in ctx.params.keys():
+        match option:
             case "work_dir":
                 # show work directory
                 click.echo(f"\n- current work directory:\n\t{ctx.obj['work_dir']}")
-                if ctx.params[key]:  # change directory
+                if ctx.params[option]:  # change directory
                     click.confirm(
                         f"- new work directory:\n\t{ctx.params['work_dir']}\n  continue?",
                         abort=True,
                     )
-                    utils.write_config_file(ctx=ctx, key=key)
+                    utils.write_config_file(ctx=ctx, option=option)
             case "dummy":
-                if ctx.params[key]:  # change directory
+                if ctx.params[option]:  # change directory
                     click.echo(f"\n- dummy option: {ctx.params['dummy']}")
 
 @click.group(context_settings=CONTEXT_SETTINGS, epilog=f"See {config_dict['app']['url']} for details.")
@@ -91,16 +91,17 @@ def group(ctx, debug):
     ctx.obj["config_file"] = config_dict["default"]["config_file"]
 
     if ctx.obj["debug"]:
-        click.echo(
-            f"\n ======= Starting {config_dict['app']['name']} - src.{__name__} =======\n"
+        click.secho(message=
+            f"   ================ start {config_dict['app']['name']} - src.{__name__} ================\n"
             f" group(ctx={ctx} {type(ctx)}, debug={debug})\n"
-            f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
             f" - ctx.parent: {ctx.parent}\n"
-            f" - ctx.default_map: {ctx.default_map}\n"
-            f" - ctx.info_name: {ctx.info_name}\n"
             f" - ctx.command: {ctx.command}\n"
-            f" - ctx.params: {ctx.params}\n"
-        )
+            f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
+            f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
+            f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
+            f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
+            f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}\n"
+        , fg="green")
 # add config to main group
 group.add_command(cmd=config, name="config")
 
