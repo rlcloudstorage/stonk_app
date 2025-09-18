@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
-from pkg.main_cli import group
+from pkg.app_cli import group
 
 
 @pytest.fixture(scope="module")
@@ -9,7 +9,7 @@ def runner():
     return CliRunner()
 
 def test_main_cli_group(runner):
-    """verify all commands present"""
+    # verify all commands present
     result = runner.invoke(group, ["--help"])
     assert "config" in result.output
     assert "backtest" in result.output

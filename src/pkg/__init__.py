@@ -25,32 +25,33 @@ config_obj = ConfigParser(
 )
 
 # create main config file if if does not exist
-config_file = os.path.join(src_dir, "config.ini")
-if not os.path.isfile(config_file):
+config_file = os.path.join(src_dir, "cfg_main.ini")
+# if not os.path.isfile(config_file):
 
-    # create the config file
-    with open(config_file, "w") as cf:
+# create the config file
+with open(config_file, "w") as cf:
 
-        # gather config files from other apps
-        for root, dirs, files in os.walk(os.path.join(src_dir, "pkg")):
-            for filename in files:
-                if filename.startswith("cfg_") and filename.endswith(".ini"):
-                    f_name = filename.removeprefix('cfg_').removesuffix('.ini')
-                    config_obj.add_section(f_name)
-                    config_obj.read(os.path.join(root, filename))
+    # gather config files from other apps
+    for root, dirs, files in os.walk(os.path.join(src_dir, "pkg")):
+        for filename in files:
+            if filename.startswith("cfg_") and filename.endswith(".ini"):
+                # f_name = filename.removeprefix('cfg_').removesuffix('.ini')
+                # config_obj.add_section(f_name)
+                config_obj.read(os.path.join(root, filename))
 
-        # get info from pyproject.toml file and add to config
-        with open(f"{root_dir}/pyproject.toml", "rb") as f:
-            data = tomllib.load(f)
-            config_obj.add_section("app")
-            config_obj["app"]["name"] = data['project']['name']
-            config_obj["app"]["version"] = data['project']['version']
-            config_obj["app"]["url"] = data['project']['urls']['Source']
+    # get info from pyproject.toml file and add to config
+    with open(f"{root_dir}/pyproject.toml", "rb") as f:
+        data = tomllib.load(f)
+        config_obj.add_section("app")
+        config_obj["app"]["name"] = data['project']['name']
+        config_obj["app"]["version"] = data['project']['version']
+        config_obj["app"]["url"] = data['project']['urls']['Source']
 
-        config_obj.add_section("default")
-        config_obj.set(section="default", option="work_dir", value=os.path.join(root_dir, "work_dir"))
-        config_obj.set(section="default", option="config_file", value=config_file)
-        config_obj.write(cf)
+    config_obj.add_section("default")
+    config_obj.set(section="default", option="root_dir", value=root_dir)
+    config_obj.set(section="default", option="work_dir", value=os.path.join(root_dir, "work_dir"))
+    config_obj.set(section="default", option="config_file", value=config_file)
+    config_obj.write(cf)
 
 # config file exists, create configparser object
 config_obj.read(config_file)
@@ -71,6 +72,6 @@ config_dict = dict(
 # Start command line interface
 def start_cli():
     """pyproject.toml entry point for CLI"""
-    from . import main_cli
+    from . import app_cli
 
-    main_cli.group()
+    app_cli.group()

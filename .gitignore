@@ -2,7 +2,7 @@
 *.db
 *.bak
 *.old
-config.ini
+cfg_main.ini
 TODO
 work_dir
 x*.*

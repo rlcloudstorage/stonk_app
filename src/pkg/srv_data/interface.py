@@ -40,11 +40,11 @@ def data(ctx, database, lookback, provider):
             f" data(ctx={ctx})\n"
             f" - ctx.parent: {ctx.parent}\n"
             f" - ctx.command: {ctx.command}\n"
-            f" - ctx.info_name: {ctx.info_name}\n"
-            f" - ctx.params: {ctx.params}\n"
-            f" - ctx.args: {ctx.args}\n"
+            f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
+            f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
+            f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
             f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
-            f" - ctx.default_map: {ctx.default_map}"
+            f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}"
         )
 
 
