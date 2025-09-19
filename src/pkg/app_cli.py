@@ -1,12 +1,14 @@
 """src/pkg/main_cli.py\n
 def config(ctx)\n
-def group(ctx, debug)
+def group(ctx, debug)\n
+def config(ctx, arg, opt)
+
 """
 import logging
 
 import click
 
-from pkg import config_dict
+from pkg import config_obj
 from pkg.helper import utils
 
 
@@ -32,9 +34,9 @@ DESCRIPTION
 
 # change work directory
 @click.option(
-    "--work-dir",
+    "--work-dir", "opt",
     flag_value="work_dir",
-    type=click.Path(resolve_path=True),
+    # type=click.Path(resolve_path=True),
     help="""
     Use without arguments to display the current work directory. To
     change the location of the working directory enter absolute path
@@ -42,24 +44,23 @@ DESCRIPTION
     historical price data, and trade strategies are kept.
 """
 )
-@click.argument("work_dir", nargs=1, default=None, required=False)
+# @click.argument("work_dir", nargs=1, default=None, required=False)
 
-# dummy option
+# list config settings
 @click.option(
-    "--dummy",
-    flag_value="dummy",
+    "--list", "opt",
+    flag_value="list",
     help="""
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu
     urna dapibus, ultrices nisl ut, elementum ante. Curabitur semper
     sem massa, nec dignissim leo iaculis sit amet.
 """
 )
-@click.argument("dummy", nargs=1, default=None, required=False)
+@click.argument("arg", nargs=1, default=None, required=False)
 
 @click.pass_context
-def config(ctx, dummy, work_dir):
+def config(ctx, arg, opt):
     """Edit configuration settings."""
-    from pkg import config_obj
 
     ctx.obj["config_obj"] = config_obj
 
@@ -74,25 +75,28 @@ def config(ctx, dummy, work_dir):
             f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
             f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}"
         )
-    # iterate over options in ctx.params dict
-    for option in ctx.params.keys():
-        match option:
-            case "work_dir":
-                # show work directory
-                click.echo(f"\n- current work directory:\n\t{config_obj['default']['work_dir']}")
-                if ctx.params[option]:  # change directory
-                    click.confirm(
-                        f"- new work directory:\n\t{ctx.params['work_dir']}\n  continue?",
-                        abort=True,
-                    )
-                    utils.write_config_file(ctx=ctx, option=option)
-            case "dummy":
-                if ctx.params[option]:  # change directory
-                    click.echo(f"\n- dummy option: {ctx.params['dummy']}")
 
-@click.group(context_settings=CONTEXT_SETTINGS, epilog=f"See {config_dict['app']['url']} for details.")
+    match opt:
+
+        case "work_dir":
+            if not arg:
+                click.echo(f"- current {opt} directory:\n\t{ctx.obj['config_obj']['config'][opt]}")
+            elif arg:
+                click.confirm(f"- new work directory:\n\t{arg}\n  continue?", abort=True,)
+                utils.write_config_file(ctx=ctx, option=opt)
+
+        case "list":
+            s = " config settings "
+            click.echo(f"\t{s:-^36}")
+            for section in config_obj.sections():
+                click.echo(f"\t*** {section} ***")
+                sect_dict = dict(config_obj.items(section=section))
+                for k, v in sect_dict.items():
+                    click.echo(f" {k: <16} {v}")
+
+@click.group(context_settings=CONTEXT_SETTINGS, epilog=f"See {config_obj['app']['url']} for details.")
 @click.option('--debug/--no-debug', default=False, help='Enable debug mode.')
-@click.version_option(version=config_dict["app"]["version"])
+@click.version_option(version=config_obj["app"]["version"])
 @click.pass_context
 def group(ctx, debug):
     """
@@ -102,11 +106,11 @@ def group(ctx, debug):
     """
     ctx.ensure_object(dict)
     ctx.obj["debug"] = debug
-    ctx.obj["root_dir"] = config_dict["default"]["root_dir"]
+    ctx.obj["root_dir"] = config_obj["config"]["root_dir"]
 
     if ctx.obj["debug"]:
         click.secho(message=
-            f"    ================ start {config_dict['app']['name']} - src.{__name__} ================\n"
+            f"    ================ start {config_obj['app']['name']} - src.{__name__} ================\n"
             f" group(ctx={ctx} {type(ctx)}, debug={debug})\n"
             f" - ctx.parent: {ctx.parent}\n"
             f" - ctx.command: {ctx.command}\n"
@@ -115,7 +119,7 @@ def group(ctx, debug):
             f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
             f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
             f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}\n"
-        , fg="green")
+        , fg="yellow")
 
 # add config to main group
 group.add_command(cmd=config, name="config")

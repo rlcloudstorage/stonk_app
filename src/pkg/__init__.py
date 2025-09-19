@@ -47,10 +47,10 @@ with open(config_file, "w") as cf:
         config_obj["app"]["version"] = data['project']['version']
         config_obj["app"]["url"] = data['project']['urls']['Source']
 
-    config_obj.add_section("default")
-    config_obj.set(section="default", option="root_dir", value=root_dir)
-    config_obj.set(section="default", option="work_dir", value=os.path.join(root_dir, "work_dir"))
-    config_obj.set(section="default", option="config_file", value=config_file)
+    config_obj.add_section("config")
+    config_obj.set(section="config", option="root_dir", value=root_dir)
+    config_obj.set(section="config", option="work_dir", value=os.path.join(root_dir, "work_dir"))
+    config_obj.set(section="config", option="config_file", value=config_file)
     config_obj.write(cf)
 
 # config file exists, create configparser object
