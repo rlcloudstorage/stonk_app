@@ -1,60 +1,37 @@
-from configparser import ConfigParser
-from pathlib import Path
-
-from click import Command, Context
-
 from pkg.helper import utils
 
 
 # fake config file
-config_file = ("""
-[default]
-root_dir = root_dir
+CONTENT = ("""
+[config]
 work_dir = current_dir
-config_file = temp_file
 """)
-
-# instanciate config object
-config_obj = ConfigParser()
-config_obj.read_string(config_file)
 
 
 def test_write_config_file_work_dir_case(tmp_path):
-    # create temp_file
-    temp_dir = tmp_path/"temp_dir"
+    # create temp config.ini
+    temp_dir = tmp_path / "src"
     temp_dir.mkdir()
-    temp_file = temp_dir/"test_config.ini"
-    temp_file.write_text(config_file)
-    # check if file exists
-    assert temp_file.is_file()
-    # read config data into temp_file
-    config_text = temp_file.read_text()
-    assert config_text == config_file
+    temp_file = temp_dir / "config.ini"
+    temp_file.write_text(CONTENT, encoding="utf-8")
+    assert temp_file.read_text(encoding="utf-8") == CONTENT
+    assert len(list(tmp_path.iterdir())) == 1
 
-    # fake click.Context object and option
-    ctx = Context(
-        command=Command("config"),
-        obj={
-            'debug': False,
-            'root_dir': 'root_dir',
-            'config_obj': None,
-            'config_obj': config_obj
-        },
-    )
-    ctx.info_name = "config"
-    ctx.params = {'work_dir': 'new_dir', 'dummy': None}
-    option = "work_dir"
+    ctx = {
+        'debug': True,
+        'command': 'config',
+        'src_dir': f'{temp_dir}',
+        'arg': 'new_dir',
+        'opt': 'work_dir'
+    }
 
-    with ctx:
-        # test with fake click.Context and option
-        utils.write_config_file(ctx=ctx, option=option)
+    utils.write_config_file(ctx=ctx)
 
-        # new config is in io.TextIOWrapper with name="temp_file"
-        with open("temp_file", 'r') as f1:
-            result = f1.read()
+    with open(f"{ctx['src_dir']}/config.ini", 'r') as f1:
+        result = f1.read()
 
-        assert "work_dir = new_dir" in result
+    assert "work_dir = new_dir" in result
 
-    Path.unlink("temp_file")
+    # Path.unlink("temp_file")
 
 # print(f"result.output: {result.output}")

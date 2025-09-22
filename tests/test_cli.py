@@ -26,11 +26,15 @@ def test_main_cli_config_work_dir(runner):
     result = runner.invoke(group, ["config", "--work-dir", "new_dir"], input="N")
     assert result.exit_code == 1
 
-# @pytest.mark.skip(reason="TODO")
 def test_main_cli_config_list(runner):
     # test --list option without argument
     result = runner.invoke(group, ["config", "--list"])
     assert "config settings" in result.output
     assert result.exit_code == 0
+
+def test_data_cli_fetch(runner):
+    result = runner.invoke(group, ["data", "--fetch"])
+    assert result.exit_code == 0
+
 
     # print(f"result.output: {result.output}")

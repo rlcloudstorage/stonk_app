@@ -6,10 +6,12 @@ def config(ctx, arg, opt)
 """
 import logging
 
+from pathlib import Path
+
 import click
 
 from pkg import config_obj
-from pkg.helper import utils
+from pkg.helper.utils import write_config_file
 
 
 logger = logging.getLogger(__name__)
@@ -42,10 +44,8 @@ DESCRIPTION
     change the location of the working directory enter absolute path
     to the new directory. This will be where the downloaded charts,
     historical price data, and trade strategies are kept.
-"""
+    """
 )
-# @click.argument("work_dir", nargs=1, default=None, required=False)
-
 # list config settings
 @click.option(
     "--list", "opt",
@@ -54,7 +54,7 @@ DESCRIPTION
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu
     urna dapibus, ultrices nisl ut, elementum ante. Curabitur semper
     sem massa, nec dignissim leo iaculis sit amet.
-"""
+    """
 )
 @click.argument("arg", nargs=1, default=None, required=False)
 
@@ -62,13 +62,16 @@ DESCRIPTION
 def config(ctx, arg, opt):
     """Edit configuration settings."""
 
-    ctx.obj["config_obj"] = config_obj
+    ctx.obj["command"] = ctx.info_name
+    ctx.obj["arg"] = arg
+    ctx.obj["opt"] = opt
+    ctx.obj["src_dir"] = Path(__file__).parent.parent
 
     if ctx.obj["debug"]:
         logger.debug(
             f" config(ctx={ctx})\n"
-            f" - ctx.parent: {ctx.parent}\n"
-            f" - ctx.command: {ctx.command}\n"
+            f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
+            f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
             f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
             f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
             f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
@@ -79,15 +82,19 @@ def config(ctx, arg, opt):
     match opt:
 
         case "work_dir":
+
             if not arg:
-                click.echo(f"- current {opt} directory:\n\t{ctx.obj['config_obj']['config'][opt]}")
+                click.echo(f"- current {opt} directory:\n\t{config_obj.get(section=ctx.info_name, option=opt)}")
             elif arg:
                 click.confirm(f"- new work directory:\n\t{arg}\n  continue?", abort=True,)
-                utils.write_config_file(ctx=ctx, option=opt)
+                try:
+                    write_config_file(ctx=ctx.obj)
+                except Exception as e:
+                    logger.debug(f"*** ERROR *** {e}")
 
         case "list":
-            s = " config settings "
-            click.echo(f"\t{s:-^36}")
+            title = " config settings "
+            click.echo(f"\t{title:-^36}")
             for section in config_obj.sections():
                 click.echo(f"\t*** {section} ***")
                 sect_dict = dict(config_obj.items(section=section))
@@ -106,14 +113,13 @@ def group(ctx, debug):
     """
     ctx.ensure_object(dict)
     ctx.obj["debug"] = debug
-    ctx.obj["root_dir"] = config_obj["config"]["root_dir"]
 
     if ctx.obj["debug"]:
         click.secho(message=
             f"    ================ start {config_obj['app']['name']} - src.{__name__} ================\n"
             f" group(ctx={ctx} {type(ctx)}, debug={debug})\n"
-            f" - ctx.parent: {ctx.parent}\n"
-            f" - ctx.command: {ctx.command}\n"
+            f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
+            f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
             f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
             f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
             f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
@@ -125,11 +131,11 @@ def group(ctx, debug):
 group.add_command(cmd=config, name="config")
 
 # add other commands to main group
-from pkg.srv_backtest.interface import backtest
+from pkg.srv_backtest.cli import backtest
 group.add_command(cmd=backtest, name="backtest")
 
-from pkg.srv_chart.interface import chart
+from pkg.srv_chart.cli import chart
 group.add_command(cmd=chart, name="chart")
 
-from pkg.srv_data.interface import data
+from pkg.srv_data.cli import data
 group.add_command(cmd=data, name="data")
