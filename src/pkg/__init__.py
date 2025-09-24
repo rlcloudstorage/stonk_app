@@ -1,4 +1,13 @@
-"""src/pkg/__init__.py"""
+"""
+src/pkg/__init__.py
+-------------------
+Setup logger, configuration setting, and CLI entry point
+
+Functions:
+    start_cli(): pyproject.toml entry point for CLI
+Variables:
+    config_obj: ConfigParser object
+"""
 import logging, logging.config
 import os, tomllib
 
@@ -7,16 +16,37 @@ from configparser import ConfigParser
 from dotenv import load_dotenv
 
 
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # read environment variables from .env file
-load_dotenv(os.path.join(os.path.join(root_dir, "src/"), ".env"))
-
-# check work_dir exists, if not create it
-os.makedirs(os.path.join(root_dir, "work_dir"), exist_ok=True)
+load_dotenv(os.path.join(os.path.join(ROOT_DIR, "src/"), ".env"))
 
 # set up logging
-logging.config.fileConfig(fname=os.path.join(os.path.join(root_dir, "src/"), "logger.ini"))
+logging.config.fileConfig(fname=os.path.join(os.path.join(ROOT_DIR, "src/"), "logger.ini"))
+
+def click_logger(ctx: object, logger: object) -> None:
+    """
+    Log some click ctx object info
+    ------------------------------
+    Args:
+        ctx (click.core.Context object):
+        logger (logging.Logger):
+    Returns:
+        None:
+    """
+    logger.debug(
+        f"\n {ctx.info_name}(ctx={ctx})\n"
+        f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
+        f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
+        f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
+        f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
+        f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
+        f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
+        f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}\n"
+    )
+
+# check work_dir exists, if not create it
+os.makedirs(os.path.join(ROOT_DIR, "work_dir"), exist_ok=True)
 
 # create getlist() converter (used for reading ticker symbols)
 config_obj = ConfigParser(
@@ -28,7 +58,7 @@ config_obj = ConfigParser(
 # print(checksums)
 
 # create main config file if if does not exist
-config_file = os.path.join(os.path.join(root_dir, "src/"), "config.ini")
+config_file = os.path.join(os.path.join(ROOT_DIR, "src/"), "config.ini")
 
 if not os.path.isfile(config_file):
 
@@ -36,21 +66,29 @@ if not os.path.isfile(config_file):
     with open(config_file, "w") as cf:
 
         # gather config files from other apps
-        for root, dirs, files in os.walk(os.path.join(os.path.join(root_dir, "src/"), "pkg")):
+        for root, dirs, files in os.walk(os.path.join(os.path.join(ROOT_DIR, "src/"), "pkg")):
             for filename in files:
                 if filename == "config.ini":
                     config_obj.read(os.path.join(root, filename))
 
-        # get info from pyproject.toml file and add to config
-        with open(f"{root_dir}/pyproject.toml", "rb") as f:
+        # get info from pyproject.toml file
+        with open(f"{ROOT_DIR}/pyproject.toml", "rb") as f:
             data = tomllib.load(f)
             config_obj.add_section("app")
             config_obj["app"]["name"] = data['project']['name']
             config_obj["app"]["version"] = data['project']['version']
             config_obj["app"]["url"] = data['project']['urls']['Source']
 
+        # values from .env file (if any)
+        # if os.getenv("CHART_LIST"):
+        #     config_obj.set(section="data", option="chart_list", value=os.getenv("CHART_LIST"))
+        if os.getenv("DATA_LIST"):
+            config_obj.set(section="data", option="data_list", value=os.getenv("DATA_LIST"))
+
+        # add work_dir to config
         config_obj.add_section("config")
-        config_obj.set(section="config", option="work_dir", value=os.path.join(root_dir, "work_dir"))
+        config_obj.set(section="config", option="work_dir", value=os.path.join(ROOT_DIR, "work_dir"))
+
         config_obj.write(cf)
 
 # config file exists, create configparser object
@@ -63,13 +101,7 @@ config_obj.read(config_file)
 #     for section in config_obj.sections()
 # )
 
-# # add to config_dict
-# if os.getenv("CHART_LIST"):
-#     config_dict["default"]["chart_list"] = os.getenv("CHART_LIST")
-# if os.getenv("DATA_LIST"):
-#     config_dict["default"]["data_list"] = os.getenv("DATA_LIST")
-
-# Start command line interface
+# start command line interface
 def start_cli():
     """pyproject.toml entry point for CLI"""
     from . import app_cli

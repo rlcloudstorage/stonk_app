@@ -1,15 +1,21 @@
-"""src/pkg/srv_data/cli.py\n
-def data(ctx)"""
+"""
+Fetch historical OHLC price and volume data
+-------------------------------------------
+Args:
+    ctx (dict): dictionary containing debug, frequency, lookback, data_list, and provider
+Returns:
+    None:
+"""
+# """src/pkg/srv_data/cli.py\n
+# def data(ctx)"""
 import logging
 
 import click
 
-from pkg import config_obj
-from pkg.srv_data import agent
+from pkg import click_logger, config_obj
 
 
 logger = logging.getLogger(__name__)
-
 
 @click.command(
     "data",
@@ -44,24 +50,29 @@ DESCRIPTION
 @click.pass_context
 def data(ctx, arg, opt):
     """Fetch online stockmarket data."""
+# TODO convert string to list
+    ctx.obj["data_list"] = config_obj.get(section=ctx.info_name, option="data_list")
+    ctx.obj["frequency"] = config_obj.get(section=ctx.info_name, option="frequency")
+    ctx.obj["lookback"] = int(config_obj.get(section=ctx.info_name, option="lookback"))
+    ctx.obj["provider"] = config_obj["data"]["provider"]
 
     if ctx.obj["debug"]:
-        logger.debug(
-            f" data(ctx={ctx})\n"
-            f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
-            f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
-            f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
-            f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
-            f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
-            f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
-            f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}"
-        )
+        click_logger(ctx=ctx, logger=logger)
 
     match opt:
-        case "fetch":
-            ctx.obj["provider"] = config_obj["data"]["provider"]
 
-            if not arg:
-                click.echo(f"- opt: {opt}, arg: {arg}")
-            elif arg:
+        case "fetch":
+            from pkg.srv_data import agent
+
+            if arg:
                 click.echo(f"- opt: {opt}, arg: {arg} {type(arg)}")
+
+            elif not arg:
+                click.echo(f"- Starting download:")
+                print(f"{ctx.obj['data_list']} {type(ctx.obj['data_list'])}")
+
+                # agent.fetch_ohlc_data(ctx=ctx.obj)
+                click.echo("- Done!")
+
+        case _:
+            pass

@@ -1,8 +1,11 @@
-"""src/pkg/main_cli.py\n
-def config(ctx)\n
-def group(ctx, debug)\n
-def config(ctx, arg, opt)
+"""
+src/pkg/main_cli.py
+-------------------
+Define main group and config command, import all other commands
 
+Functions:
+    group(ctx, debug): holds all sub-commands
+    config(ctx, arg, opt): edit configuration settings
 """
 import logging
 
@@ -10,7 +13,7 @@ from pathlib import Path
 
 import click
 
-from pkg import config_obj
+from pkg import click_logger, config_obj
 from pkg.helper.utils import write_config_file
 
 
@@ -68,16 +71,7 @@ def config(ctx, arg, opt):
     ctx.obj["src_dir"] = Path(__file__).parent.parent
 
     if ctx.obj["debug"]:
-        logger.debug(
-            f" config(ctx={ctx})\n"
-            f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
-            f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
-            f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
-            f" - ctx.params: {ctx.params} {type(ctx.params)}\n"
-            f" - ctx.args: {ctx.args} {type(ctx.args)}\n"
-            f" - ctx.obj: {ctx.obj} {type(ctx.obj)})\n"
-            f" - ctx.default_map: {ctx.default_map} {type(ctx.default_map)}"
-        )
+        click_logger(ctx=ctx, logger=logger)
 
     match opt:
 
@@ -117,7 +111,7 @@ def group(ctx, debug):
     if ctx.obj["debug"]:
         click.secho(message=
             f"    ================ start {config_obj['app']['name']} - src.{__name__} ================\n"
-            f" group(ctx={ctx} {type(ctx)}, debug={debug})\n"
+            f" group(ctx={ctx})\n"
             f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
             f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
             f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"

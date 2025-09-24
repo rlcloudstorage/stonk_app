@@ -1,5 +1,10 @@
-"""src/pkg/helper/utils.py\n
-def write_config_file(ctx: object, key: str)->None
+"""
+src/pkg/helper/utils.py
+-----------------------
+Config helper functions,
+
+Functions:
+    write_config_file(): write values to config file
 """
 import logging
 
