@@ -78,9 +78,9 @@ def config(ctx, arg, opt):
         case "work_dir":
 
             if not arg:
-                click.echo(f"- current {opt} directory:\n\t{config_obj.get(section=ctx.info_name, option=opt)}")
+                click.echo(f"- current {opt}:\n\t{config_obj.get(section=ctx.info_name, option=opt)}")
             elif arg:
-                click.confirm(f"- new work directory:\n\t{arg}\n  continue?", abort=True,)
+                click.confirm(f"- new {opt}:\n\t{arg}\n  continue?", abort=True,)
                 try:
                     write_config_file(ctx=ctx.obj)
                 except Exception as e:

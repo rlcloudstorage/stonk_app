@@ -48,6 +48,12 @@ def click_logger(ctx: object, logger: object) -> None:
 # check work_dir exists, if not create it
 os.makedirs(os.path.join(ROOT_DIR, "work_dir"), exist_ok=True)
 
+# create data folder in work_dir
+os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "data"), exist_ok=True)
+
+# create strategy folder in work_dir
+os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "strat"), exist_ok=True)
+
 # create getlist() converter (used for reading ticker symbols)
 config_obj = ConfigParser(
     allow_no_value=True, converters={"list": lambda x: [i.strip() for i in x.split(",")]}
@@ -88,6 +94,8 @@ if not os.path.isfile(config_file):
         # add work_dir to config
         config_obj.add_section("config")
         config_obj.set(section="config", option="work_dir", value=os.path.join(ROOT_DIR, "work_dir"))
+        config_obj.set(section="config", option="data_dir", value=os.path.join(f"{ROOT_DIR}/work_dir", "data"))
+        config_obj.set(section="config", option="strat_dir", value=os.path.join(f"{ROOT_DIR}/work_dir", "strat"))
 
         config_obj.write(cf)
 

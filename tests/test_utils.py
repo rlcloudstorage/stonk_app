@@ -1,3 +1,7 @@
+import sqlite3
+
+from pathlib import Path
+
 from pkg.helper import utils
 
 
@@ -20,9 +24,9 @@ def test_write_config_file_work_dir_case(tmp_path):
     ctx = {
         'debug': True,
         'command': 'config',
-        'src_dir': f'{temp_dir}',
         'arg': 'new_dir',
-        'opt': 'work_dir'
+        'opt': 'work_dir',
+        'src_dir': temp_dir
     }
 
     utils.write_config_file(ctx=ctx)
@@ -32,6 +36,39 @@ def test_write_config_file_work_dir_case(tmp_path):
 
     assert "work_dir = new_dir" in result
 
-    # Path.unlink("temp_file")
+    # Path.unlink("config.ini")
+
+
+def test_create_ohlc_database(tmp_path):
+    # create temp database
+    temp_dir = tmp_path / "data"
+    temp_dir.mkdir()
+    temp_file = temp_dir / "temp.db"
+    assert len(list(tmp_path.iterdir())) == 1
+
+    ctx = {
+        'debug': True,
+        'database': 'temp.db',
+        'data_list': ['aaa', 'bbb'],
+        'frequency': 'daily',
+        'lookback': 42,
+        'provider': 'yfinance'
+    }
+
+    utils.create_ohlc_database(ctx=ctx)
+
+    with sqlite3.connect('temp.db') as con:
+        cur = con.cursor()
+
+        # check tables
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        assert cur.fetchall() == [('aaa',), ('bbb',)]
+
+        # check columns
+        cur.execute("SELECT * FROM bbb")
+        assert [i[0] for i in cur.description] == ['datetime', 'open', 'high', 'low', 'close', 'volume']
+
+    Path.unlink("temp.db")
+
 
 # print(f"result.output: {result.output}")
