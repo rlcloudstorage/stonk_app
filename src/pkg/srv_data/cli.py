@@ -11,6 +11,7 @@ import logging
 import click
 
 from pkg import click_logger, config_obj
+from pkg.srv_data import agent
 
 
 logger = logging.getLogger(__name__)
@@ -29,17 +30,6 @@ DESCRIPTION
     sem massa, nec dignissim leo iaculis sit amet.
 """,
 )
-# setup database
-@click.option(
-    "--database", "opt",
-    flag_value="database",
-    help="""
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu
-    urna dapibus, ultrices nisl ut, elementum ante. Curabitur semper
-    sem massa, nec dignissim leo iaculis sit amet.
-    """
-)
-@click.option("--lookback", "opt", flag_value="lookback",)
 # download online OHLC data
 @click.option(
     "--ohlc", "opt",
@@ -50,65 +40,86 @@ DESCRIPTION
     sem massa, nec dignissim leo iaculis sit amet.
     """
 )
-@click.option("--provider", "opt", flag_value="provider",)
+# download online signal data
+@click.option(
+    "--signal", "opt",
+    flag_value="signal",
+    help="""
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu
+    urna dapibus, ultrices nisl ut, elementum ante. Curabitur semper
+    sem massa, nec dignissim leo iaculis sit amet.
+    """
+)
 @click.argument("arg", nargs=1, default=None, required=False)
 
 @click.pass_context
 def data(ctx, arg, opt):
     """Download and save online stockmarket data"""
 
-    ctx.obj["database"] = config_obj.get(section=ctx.info_name, option="database")
-    ctx.obj["data_list"] = (config_obj.get(section=ctx.info_name, option="data_list")).upper().split()
+    if arg:  # use provided arguments
+        ctx.obj[f"{opt}_pool"] = arg.upper().split()
+    else:  # try default arguments
+        try:
+            ctx.obj[f"{opt}_pool"] = (config_obj.get(section=ctx.info_name, option=f"{opt}_pool")).upper().split()
+        except:
+            click.echo(f" This command requires an option, try 'stonk-app {ctx.info_name} --help'\n")
+            return
+
+    provider = config_obj.get(section=ctx.info_name, option="provider")
+    ctx.obj["provider"] = click.prompt(
+        text=f"\n* Using provider '{provider}' (valid choices are tiingo/yfinance)\n  Type a new provider name to change, press Enter to accept",
+        type=click.Choice(["tiingo", "yfinance"]), show_choices=False,
+        default=provider, show_default=False
+    )
+
+    lookback = int(config_obj.get(section=ctx.info_name, option="lookback"))
+    ctx.obj["lookback"] = click.prompt(
+        text=f"* Lookback period is {lookback} days\n  Input new period to change, press Enter to accept",
+        type=int, default=lookback, show_default=False
+    )
+
+    database = (
+        f"{config_obj.get(section='config', option='data_dir')}/"  # data directory
+        f"{ctx.obj['provider']}_{opt}_{ctx.obj['lookback']}.db"  # database name
+    )
+    ctx.obj["database"] = click.prompt(
+        text=f"* Using database '{database}'\n  Type a new database name to change, press Enter to accept",
+        default=database, show_default=False
+    )
+
     ctx.obj["frequency"] = config_obj.get(section=ctx.info_name, option="frequency")
-    ctx.obj["lookback"] = int(config_obj.get(section=ctx.info_name, option="lookback"))
+
     ctx.obj["option"] = ctx.params["opt"]
-    ctx.obj["provider"] = config_obj["data"]["provider"]
+
+    try:  # if processing signal data, get signal list
+        ctx.obj["signal_list"] = (config_obj.get(section=ctx.info_name, option=opt)).lower().split()
+    except:
+        pass
+
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 
     if ctx.obj["debug"]:
         click_logger(ctx=ctx, logger=logger)
 
+
     match opt:
 
-        case "database":
-            click.echo("*** database ***")
-
-            # if not arg:
-            #     click.echo(f"- current {opt}:\n\t{config_obj.get(section=ctx.info_name, option=opt)}")
-            # elif arg:
-            #     click.confirm(f"- new {opt}:\n\t{arg}\n  continue?", abort=True,)
-            #     try:
-            #         write_config_file(ctx=ctx.obj)
-            #     except Exception as e:
-            #         logger.debug(f"*** ERROR *** {e}")
-
-
-    # # create data folder in users work_dir
-    # Path(f"{ctx['default']['work_dir']}{ctx['interface']['command']}").mkdir(parents=True, exist_ok=True)
-    # # if old database exists remove it
-    # Path(f"{ctx['default']['work_dir']}{ctx['interface']['command']}/{ctx['interface']['database']}").unlink(missing_ok=True)
-
-    # ctx.obj["frequency"] = config_obj.get(section=ctx.info_name, option="frequency")
-
-
         case "ohlc":
-            from pkg.srv_data import agent
 
-            if not ctx.obj["database"]:
-                ctx.obj["database"] = (
-                    f"{config_obj.get(section='config', option='data_dir')}/"  # data directory
-                    f"{ctx.obj['provider']}_{opt}_{ctx.obj['lookback']}.db"  # database name
-                )
             if not ctx.obj["debug"]:
-                click.echo(f"- start:")
-
-            if arg:
-                ctx.obj["data_list"] = arg.upper().split()
+                click.echo(f"\n- start:")
 
             agent.fetch_ohlc_data(ctx=ctx.obj)
 
             if not ctx.obj["debug"]:
-                click.echo("- finish")
+                click.echo("- finished!\n")
 
-        case _:
-            pass
+        case "signal":
+
+            if not ctx.obj["debug"]:
+                click.echo(f"\n- start:")
+
+            agent.fetch_signal_data(ctx=ctx.obj)
+
+            if not ctx.obj["debug"]:
+                click.echo("- finished!\n")

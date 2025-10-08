@@ -95,6 +95,9 @@ def config(ctx, arg, opt):
                 for k, v in sect_dict.items():
                     click.echo(f" {k: <16} {v}")
 
+        case _:
+            click.echo(f" This command requires an option, try 'stonk-app {ctx.info_name} --help'\n")
+
 @click.group(context_settings=CONTEXT_SETTINGS, epilog=f"See {config_obj['app']['url']} for details.")
 @click.option('--debug/--no-debug', default=False, help='Enable debug mode.')
 @click.version_option(version=config_obj["app"]["version"])

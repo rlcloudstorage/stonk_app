@@ -49,7 +49,7 @@ def test_create_ohlc_database(tmp_path):
     ctx = {
         'debug': True,
         'database': 'temp.db',
-        'data_list': ['aaa', 'bbb'],
+        'ohlc_pool': ['aaa', 'bbb'],
         'frequency': 'daily',
         'lookback': 42,
         'provider': 'yfinance'

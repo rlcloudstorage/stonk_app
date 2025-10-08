@@ -4,14 +4,6 @@ from click.testing import CliRunner
 from pkg.app_cli import group
 
 
-ctx = {
-    'debug': False,
-    'command': 'config',
-    'arg': None,
-    'opt': 'work_dir',
-    'src_dir': 'src'
-}
-
 @pytest.fixture(scope="module")
 def runner():
     return CliRunner()
@@ -40,9 +32,11 @@ def test_main_cli_config_list(runner):
     assert "config settings" in result.output
     assert result.exit_code == 0
 
-def test_data_cli_ohlc(runner):
-    result = runner.invoke(group, ["data", "--ohlc"])
-    assert "tart" in result.output
+def test_main_cli_data_command(runner):
+    # verify all commands present
+    result = runner.invoke(group, ["data", "--help"])
+    assert "ohlc" in result.output
+    assert "signal" in result.output
     assert result.exit_code == 0
 
 

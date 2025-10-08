@@ -35,7 +35,7 @@ def click_logger(ctx: object, logger: object) -> None:
         None:
     """
     logger.debug(
-        f"\n {ctx.info_name}(ctx={ctx})\n"
+        f"{ctx.info_name}({ctx})\n"
         f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
         f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
         f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"
@@ -59,18 +59,12 @@ config_obj = ConfigParser(
     allow_no_value=True, converters={"list": lambda x: [i.strip() for i in x.split(",")]}
 )
 
-# files = ["file1.txt", "file2.txt"]  # Example list of files
-# checksums = [(filename, hashlib.md5(read_file_as_bytes(filename)).hexdigest()) for filename in files]
-# print(checksums)
-
 # create main config file if if does not exist
 config_file = os.path.join(os.path.join(ROOT_DIR, "src/"), "config.ini")
 
 if not os.path.isfile(config_file):
-
     # populate src/config.ini file
     with open(config_file, "w") as cf:
-
         # gather config files from other apps
         for root, dirs, files in os.walk(os.path.join(os.path.join(ROOT_DIR, "src/"), "pkg")):
             for filename in files:
@@ -86,10 +80,10 @@ if not os.path.isfile(config_file):
             config_obj["app"]["url"] = data['project']['urls']['Source']
 
         # values from .env file (if any)
-        # if os.getenv("CHART_LIST"):
-        #     config_obj.set(section="data", option="chart_list", value=os.getenv("CHART_LIST"))
-        if os.getenv("DATA_LIST"):
-            config_obj.set(section="data", option="data_list", value=os.getenv("DATA_LIST"))
+        if os.getenv("OHLC_POOL"):
+            config_obj.set(section="data", option="ohlc_pool", value=os.getenv("OHLC_POOL"))
+        if os.getenv("SIGNAL_POOL"):
+            config_obj.set(section="data", option="signal_pool", value=os.getenv("SIGNAL_POOL"))
 
         # add work_dir to config
         config_obj.add_section("config")
