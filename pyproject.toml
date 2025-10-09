@@ -64,7 +64,7 @@ target-version = ['py3']
 #target-version = ['py311']
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "srv_data",]
+testpaths = ["tests", "srv_chart", "srv_data",]
 
 [tool.coverage.run]
 branch = true

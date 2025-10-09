@@ -91,22 +91,22 @@ class TiingoDataProcessor(BaseProcessor):
         # Initialize
         client = self.TiingoClient(config)
 
-        # try:
-        #     historical_prices = client.get_ticker_price(
-        #         ticker=ticker, fmt='json', startDate=self.start_date, endDate=self.end_date, frequency=self.frequency
-        #     )
-        # except Exception as e:
-        #     logger.debug(f"*** ERROR *** {e}")
-        # else:
-        #     # # pickle ticker, historical_prices
-        #     # with open(f"{self.work_dir}/ohlc/{ticker}_t.pkl", "wb") as pkl:
-        #     #     pickle.dump((ticker, historical_prices), pkl)
-        #     yield ticker, historical_prices
+        try:
+            historical_prices = client.get_ticker_price(
+                ticker=ticker, fmt='json', startDate=self.start_date, endDate=self.end_date, frequency=self.frequency
+            )
+        except Exception as e:
+            logger.debug(f"*** ERROR *** {e}")
+        else:
+            # # pickle ticker, historical_prices
+            # with open(f"{self.work_dir}/ohlc/{ticker}_t.pkl", "wb") as pkl:
+            #     pickle.dump((ticker, historical_prices), pkl)
+            yield ticker, historical_prices
 
-        # yield data from saved pickle file
-        with open(f"{self.work_dir}/ohlc/{ticker}_t.pkl", "rb") as pkl:
-            ticker, historical_prices = pickle.load((pkl))
-        yield ticker, historical_prices
+        # # yield data from saved pickle file
+        # with open(f"{self.work_dir}/ohlc/{ticker}_t.pkl", "rb") as pkl:
+        #     ticker, historical_prices = pickle.load((pkl))
+        # yield ticker, historical_prices
 
 
     def _process_ohlc_data(self, data_gen: object) -> list[tuple]:
@@ -211,6 +211,7 @@ class YahooFinanceDataProcessor(BaseProcessor):
     def __repr__(self):
         return (
             f"{self.__class__.__name__}("
+            f"interval={self.interval}, "
             f"start_date={self.start_date}, "
             f"end_date={self.end_date})"
         )
@@ -229,21 +230,21 @@ class YahooFinanceDataProcessor(BaseProcessor):
         if self.debug:
             logger.debug(f"_data_generator(ticker={ticker})")
 
-        # try:  # yield data from yfinance
-        #     yf_data = self.yf.Ticker(ticker=ticker)
-        #     yf_df = yf_data.history(start=self.start_date, end=self.end_date, interval=self.interval)
-        # except Exception as e:
-        #     logger.debug(f"*** ERROR *** {e}")
-        # else:
-        # #     # save ticker, yf_df to pickle
-        # #     with open(f"{self.work_dir}/ohlc/{ticker}_yf.pkl", "wb") as pkl:
-        # #         pickle.dump((ticker, yf_df), pkl)
-        #     yield ticker, yf_df
+        try:  # yield data from yfinance
+            yf_data = self.yf.Ticker(ticker=ticker)
+            yf_df = yf_data.history(start=self.start_date, end=self.end_date, interval=self.interval)
+        except Exception as e:
+            logger.debug(f"*** ERROR *** {e}")
+        else:
+        #     # save ticker, yf_df to pickle
+        #     with open(f"{self.work_dir}/ohlc/{ticker}_yf.pkl", "wb") as pkl:
+        #         pickle.dump((ticker, yf_df), pkl)
+            yield ticker, yf_df
 
-        # yield data from saved pickle file
-        with open(f"{self.work_dir}/ohlc/{ticker}_yf.pkl", "rb") as pkl:
-            ticker, df = pickle.load((pkl))
-        yield ticker, df
+        # # yield data from saved pickle file
+        # with open(f"{self.work_dir}/ohlc/{ticker}_yf.pkl", "rb") as pkl:
+        #     ticker, df = pickle.load((pkl))
+        # yield ticker, df
 
 
     def _process_ohlc_data(self, data_gen: object) -> pd.DataFrame:

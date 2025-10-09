@@ -4,7 +4,8 @@ src/pkg/srv_data/agent.py
 Select data provider, create database, download data
 
 Functions:
-    fetch_ohlc_data(): Fetch OHLC price and volume data
+    fetch_ohlc_data(): save OHLC price and volume data
+    fetch_signal_data(): save signal data
 """
 import logging, time
 

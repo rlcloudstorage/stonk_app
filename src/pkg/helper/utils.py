@@ -67,15 +67,13 @@ def create_signal_database(ctx: dict) -> None:
                         datetime    INTEGER    NOT NULL,
                         PRIMARY KEY (datetime)
                     )
-                """
-                )
+                """)
                 # add column for each item (signal_list)
                 for j in ctx["signal_list"]:
                     con.cursor.execute(
                         f"""
                         ALTER TABLE {i} ADD COLUMN {j.lower()} INTEGER
-                    """
-                    )
+                    """)
     except con.sqlite3.Error as e:
         logger.debug(f"*** ERROR *** {e}")
 

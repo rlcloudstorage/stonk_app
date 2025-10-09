@@ -81,7 +81,6 @@ class SqliteConnectManager:
     -------
     context manager\n
     """
-
     import sqlite3
 
     def __init__(self, ctx: dict, mode: str = "ro"):

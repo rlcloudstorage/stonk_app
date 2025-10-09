@@ -39,5 +39,13 @@ def test_main_cli_data_command(runner):
     assert "signal" in result.output
     assert result.exit_code == 0
 
+def test_main_cli_chart_command(runner):
+    # verify all commands present
+    result = runner.invoke(group, ["chart", "--help"])
+    assert "all" in result.output
+    assert "daily" in result.output
+    assert "weekly" in result.output
+    assert result.exit_code == 0
+
 
     # print(f"result.output: {result.output}")
