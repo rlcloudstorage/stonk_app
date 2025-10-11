@@ -48,8 +48,14 @@ def click_logger(ctx: object, logger: object) -> None:
 # check work_dir exists, if not create it
 os.makedirs(os.path.join(ROOT_DIR, "work_dir"), exist_ok=True)
 
+# create chart folder in work_dir
+os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "chart"), exist_ok=True)
+
 # create data folder in work_dir
 os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "data"), exist_ok=True)
+
+# create heatmap folder in work_dir
+os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "heatmap"), exist_ok=True)
 
 # create strategy folder in work_dir
 os.makedirs(os.path.join(f"{ROOT_DIR}/work_dir", "strat"), exist_ok=True)

@@ -9,8 +9,6 @@ Functions:
 """
 import datetime, logging, os, pickle, time
 
-from statistics import fmean
-
 import pandas as pd
 
 from dotenv import load_dotenv

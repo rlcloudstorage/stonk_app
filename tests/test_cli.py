@@ -11,10 +11,11 @@ def runner():
 def test_main_cli_group(runner):
     # verify all commands present
     result = runner.invoke(group, ["--help"])
-    assert "config" in result.output
     assert "backtest" in result.output
     assert "chart" in result.output
+    assert "config" in result.output
     assert "data" in result.output
+    assert "heatmap" in result.output
     assert result.exit_code == 0
 
 def test_main_cli_config_work_dir(runner):
@@ -33,19 +34,24 @@ def test_main_cli_config_list(runner):
     assert result.exit_code == 0
 
 def test_main_cli_data_command(runner):
-    # verify all commands present
+    # verify all options present
     result = runner.invoke(group, ["data", "--help"])
     assert "ohlc" in result.output
     assert "signal" in result.output
     assert result.exit_code == 0
 
 def test_main_cli_chart_command(runner):
-    # verify all commands present
+    # verify all options present
     result = runner.invoke(group, ["chart", "--help"])
     assert "all" in result.output
     assert "daily" in result.output
     assert "weekly" in result.output
     assert result.exit_code == 0
 
+def test_main_cli_heatmap_command(runner):
+    # verify all commands present
+    result = runner.invoke(group, ["heatmap", "--help"])
+    assert "heatmap" in result.output
+    assert result.exit_code == 0
 
     # print(f"result.output: {result.output}")

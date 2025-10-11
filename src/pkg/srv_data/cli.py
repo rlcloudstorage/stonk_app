@@ -55,6 +55,7 @@ DESCRIPTION
 @click.pass_context
 def data(ctx, arg, opt):
     """Download and save online stockmarket data"""
+# TODO no opt case defaults to --ohlc
 
     if arg:  # use provided arguments
         ctx.obj[f"{opt}_pool"] = arg.upper().split()
