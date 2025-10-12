@@ -15,74 +15,103 @@ logger = logging.getLogger(__name__)
 
 def fetch_heatmap(ctx: dict) -> None:
     """
-    Download and save historical price and volume data
-    --------------------------------------------------
+    Download and save S&P heatmaps
+    ------------------------------
     Args:
-        ctx (dict): dictionary containing debug, frequency, lookback, ohlc_list, and provider
+        ctx (dict): dictionary containing debug, heatmap_pool, command, url, and work_dir
     Returns:
         None:
     """
-    from pkg.srv_chart.client import HeatmapScraper
-
     if ctx["debug"]:
         logger.debug(f"fetch_heatmap(ctx={ctx} {type(ctx)}")
 
-    scraper = HeatmapScraper(ctx=ctx)
+# TODO create heatmap folder if not exist
+
+    scraper = _select_scraper(ctx=ctx)
     scraper.start_heatmap_download()
 
 
 def fetch_stockchart(ctx: dict) -> None:
     """
-    Download and save trade signal data
-    -----------------------------------
+    Download and save stock charts
+    ------------------------------
     Args:
-        ctx (dict): dictionary containing debug, frequency, lookback, signal_list, and provider
+        ctx (dict): dictionary containing debug, chart_pool, command, url, and work_dir
     Returns:
         None:
     """
-    from pkg.helper.utils import create_signal_database, write_signal_database
-
     if ctx["debug"]:
         logger.debug(f"fetch_stockchart(ctx={ctx} {type(ctx)}")
 
-    # create database
-    if not ctx["debug"]:
-        print(f"creating db '{ctx['database']}'")
-    create_signal_database(ctx=ctx)
 
-    # select data provider
-    processor = _select_data_processor(ctx=ctx)
-
-    # get and save data for each ticker in signal_pool
-    for ticker in ctx["signal_pool"]:
-
-        if not ctx["debug"]:
-            print(f"fetching {ticker} data...", end="\r", flush=True)
-            time.sleep(.5)
-        data_tuple = processor.download_and_parse_signal_data(ticker=ticker)
-
-        if not ctx["debug"]:
-            print(f"writing {ticker} data to db...", end=" ")
-        write_signal_database(ctx=ctx, data_tuple=data_tuple)
-
-        if not ctx["debug"]:
-            print(f"done,")
-
-
-def _select_data_processor(ctx: dict) -> object:
+def _select_scraper(ctx: dict) -> object:
     """"""
     if ctx["debug"]:
-        logger.debug(f"_select_data_processor(ctx={type(ctx)})")
+        logger.debug(f"_select_scraper(ctx={type(ctx)})")
 
-    match ctx["provider"]:
+    match ctx["command"]:
 
-        case "tiingo":
-            from pkg.srv_data.client import TiingoDataProcessor
-            return TiingoDataProcessor(ctx=ctx)
+        case "heatmap":
+            from pkg.srv_chart.client import HeatmapScraper
+            return HeatmapScraper(ctx=ctx)
 
-        case "yfinance":
-            from pkg.srv_data.client import YahooFinanceDataProcessor
-            return YahooFinanceDataProcessor(ctx=ctx)
+        case "chart":
+            from pkg.srv_chart.client import StockChartScraper
+            return StockChartScraper(ctx=ctx)
+
+
+# def fetch_stockchart(ctx: dict) -> None:
+#     """
+#     Download and save trade signal data
+#     -----------------------------------
+#     Args:
+#         ctx (dict): dictionary containing debug, frequency, lookback, signal_list, and provider
+#     Returns:
+#         None:
+#     """
+#     from pkg.helper.utils import create_signal_database, write_signal_database
+
+#     if ctx["debug"]:
+#         logger.debug(f"fetch_stockchart(ctx={ctx} {type(ctx)}")
+
+#     # create database
+#     if not ctx["debug"]:
+#         print(f"creating db '{ctx['database']}'")
+#     create_signal_database(ctx=ctx)
+
+#     # select data provider
+#     processor = _select_data_processor(ctx=ctx)
+
+#     # get and save data for each ticker in signal_pool
+#     for ticker in ctx["signal_pool"]:
+
+#         if not ctx["debug"]:
+#             print(f"fetching {ticker} data...", end="\r", flush=True)
+#             time.sleep(.5)
+#         data_tuple = processor.download_and_parse_signal_data(ticker=ticker)
+
+#         if not ctx["debug"]:
+#             print(f"writing {ticker} data to db...", end=" ")
+#         write_signal_database(ctx=ctx, data_tuple=data_tuple)
+
+#         if not ctx["debug"]:
+#             print(f"done,")
+
+
+# def _select_data_processor(ctx: dict) -> object:
+#     """"""
+#     if ctx["debug"]:
+#         logger.debug(f"_select_data_processor(ctx={type(ctx)})")
+
+#     match ctx["provider"]:
+
+#         case "tiingo":
+#             from pkg.srv_data.client import TiingoDataProcessor
+#             return TiingoDataProcessor(ctx=ctx)
+
+#         case "yfinance":
+#             from pkg.srv_data.client import YahooFinanceDataProcessor
+#             return YahooFinanceDataProcessor(ctx=ctx)
 
 
 # """src/pkg/chart_srv/client.py\n

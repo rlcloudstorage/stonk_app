@@ -1,3 +1,23 @@
+from pkg.srv_chart.agent import _select_scraper
+from pkg.srv_chart.client import StockChartScraper
+
+
+ctx = {
+    'debug': True,
+    'chart_pool': ['YANG', 'YINN'],
+    'command': 'chart',
+    'url': 'https://stockcharts.com/sc3/ui/?s=AAPL',
+    'work_dir': '/home/la/dev/rl/stonk_app/work_dir'
+}
+
+
+def test_fetch_stockchart():
+    scraper = _select_scraper(ctx=ctx)
+    assert isinstance(scraper, StockChartScraper)
+
+
+
+
 # from pkg.srv_data.agent import _select_data_processor
 # from pkg.srv_data.client import TiingoDataProcessor, YahooFinanceDataProcessor
 

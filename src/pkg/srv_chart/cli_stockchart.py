@@ -65,18 +65,18 @@ def chart(ctx, arg, opt):
     if ctx.obj["debug"]:
         click_logger(ctx=ctx, logger=logger)
 
-    # Convert option flag_value to a list
-    period_dict = {
-        "all": ["Daily", "Weekly"],
-        "daily": ["Daily",],
-        "weekly": ["Weekly",],
-    }
+    # # Convert option flag_value to a list
+    # period_dict = {
+    #     "all": ["Daily", "Weekly"],
+    #     "daily": ["Daily",],
+    #     "weekly": ["Weekly",],
+    # }
 
-    # Add 'opt_trans' to 'interface' ctx
-    if opt == None:  # set default value to daily
-        ctx["interface"]["opt_trans"] = period_dict["daily"]
-    else:  # use period_dict value
-        ctx["interface"]["opt_trans"] = period_dict[opt]
+    # # Add 'opt_trans' to 'interface' ctx
+    # if opt == None:  # set default value to daily
+    #     ctx["interface"]["opt_trans"] = period_dict["daily"]
+    # else:  # use period_dict value
+    #     ctx["interface"]["opt_trans"] = period_dict[opt]
 
 
 # def cli(ctx, arguments, opt_trans):
