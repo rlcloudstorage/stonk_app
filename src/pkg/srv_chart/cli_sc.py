@@ -1,10 +1,10 @@
 """
-pkg/srv_chart/cli_heatmap.py
-----------------------------
-CLI for heatmap service
+pkg/srv_chart/cli.py
+-------------------
+CLI for chart service
 
 Functions:
-    heatmap(): entry point for chart service
+    chart(): entry point for chart service
 """
 import logging
 
@@ -16,14 +16,13 @@ from pkg.srv_chart import agent
 
 logger = logging.getLogger(__name__)
 
-
 @click.command(
-    "heatmap",
-    short_help="Download and save S & P heatmaps",
+    "chart",
+    short_help="Download and save online stock charts",
     help="""
 \b
 NAME
-    heatmap - Download and save S & P heatmaps
+    chart - Download and save online stock charts
 \b
 DESCRIPTION
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu
@@ -31,23 +30,37 @@ DESCRIPTION
     sem massa, nec dignissim leo iaculis sit amet.
 """,
 )
-
-@click.argument(
-    "arg", nargs=-1, default=None, required=False,
-    type=click.Choice(choices=("1d", "1w", "1m", "3m", "6m"), case_sensitive=False)
+# fetch daily and weekly charts
+@click.option(
+    "-a", "--all", "opt",
+    flag_value="all",
+    help="Fetch daily and weekly charts"
 )
+# fetch only daily charts
+@click.option(
+    "-d", "--daily", "opt",
+    flag_value="daily",
+    help="Fetch only daily charts"
+)
+# fetch only weekly charts
+@click.option(
+    "-w", "--weekly", "opt",
+    flag_value="weekly",
+    help="Fetch only weekly charts"
+)
+@click.argument("arg", nargs=1, default=None, required=False)
 
 @click.pass_context
-def heatmap(ctx, arg):
-    """Download and save S & P heatmaps"""
+def chart(ctx, arg, opt):
+    """Download and save online stockcharts"""
 
     if arg:  # use provided arguments
         ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
     else:  # try default arguments
         try:
-            ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
+            ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
         except:
-            click.echo(f" No default heatmap pool is set, try 'stonk-app config --help'\n")
+            click.echo(f" No default stockchart pool is set, try 'stonk-app config --help'\n")
             return
 
     ctx.obj["command"] = ctx.info_name
@@ -60,11 +73,10 @@ def heatmap(ctx, arg):
     if not ctx.obj["debug"]:
         click.echo(f"\n- start:")
 
-    agent.fetch_heatmap(ctx=ctx.obj)
+    agent.fetch_stockchart(ctx=ctx.obj)
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")
-
 
     # # Convert option flag_value to a list
     # period_dict = {
@@ -126,4 +138,4 @@ def heatmap(ctx, arg):
 
 
 if __name__ == "__main__":
-    heatmap()
+    chart()

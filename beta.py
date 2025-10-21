@@ -1,13 +1,11 @@
+"""src/pkg/chart_srv/scraper/heat_map.py\n
+Use selenium, create a webdriver, update query time value in\n
+base_url with urllib parse. Get image source bytes then save\n
+PNG image to work directory.
 """
-src/pkg/srv_chart/client.py
----------------------------
-All classes inherit from BaseScraper class
 
-Class:
-    HeatmapScraper(): https://stockanalysis.com/markets/heatmap/
-    StockChartScraper(): https://stockcharts.com/sc3/ui/?s=AAPL
-"""
-import logging, os
+import logging, logging.config
+import os
 
 from io import BytesIO
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -25,58 +23,51 @@ from selenium.common.exceptions import (
 )
 
 
+logging.config.fileConfig(fname="src/logger.ini")
 logging.getLogger("PIL").setLevel(logging.WARNING)
 logging.getLogger("selenium").setLevel(logging.WARNING)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-class BaseScraper:
-    """"""
+ctx = {
+    'debug': True,
+    'heatmap_pool': ['1d'],
+    'command': 'heatmap',
+    'url': 'https://stockanalysis.com/markets/heatmap/',
+    'work_dir': '/home/la/dev/rl/stonk_app/work_dir'
+}
+
+
+class WebScraper:
+    """Fetch and save heatmaps from stockanalysis.com"""
+
     def __init__(self, ctx):
         self.debug = ctx["debug"]
         self.base_url = ctx["url"]
-        self.command = ctx["command"]
-        self.options = FirefoxOptions()
-        self.options.add_argument("--disable-notifications")
-        self.options.add_argument("--headless=new")
-        self.options.add_argument("--user-agent='Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0'")
-        self.options.page_load_strategy = "none"
-
+        self.heatmap_pool = ctx["heatmap_pool"]
+        self.work_dir = ctx["work_dir"]
 
     def __repr__(self):
         return f"<class '{self.__class__.__name__}'> __dict__= {self.__dict__})"
 
-
-class HeatmapScraper(BaseScraper):
-    """Get heatmap from https://stockanalysis.com/markets/heatmap/
-
-        Functions:
-            fetch_heatmap(): Main entry point to class. Directs workflow of webscraper
-    """
-
-
-    def __init__(self, ctx: dict):
-        super().__init__(ctx=ctx)
-        self.dir = f"{ctx['work_dir']}/heatmap"
-        self.heatmap_pool = ctx['heatmap_pool']
-
-
     def fetch_heatmap(self):
-        """Main entry point to class. Directs workflow of Webscraper"""
+        """Main entry point to class. Directs workflow of Webscraper."""
         if self.debug:
             logger.debug(f"fetch_heatmap(self={self})")
 
+        opt = FirefoxOptions()
+        opt.add_argument("--headless=new")
+        opt.add_argument("--user-agent='Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0'")
+        opt.page_load_strategy = "none"
+        driver = Firefox(options=opt)
+
         for heatmap in self.heatmap_pool:
-            if not self.debug:
-                print(f"fetching {heatmap} heatmap...", end="\r", flush=True)
+            print(f"  fetching heatmap {heatmap}...")
             try:
-                driver = Firefox(options=self.options)
                 mod_url = self._modify_query_time_period(heatmap=heatmap)
                 driver.get(mod_url)
-                image_src = self._return_png_img_bytes(driver=driver)
-                if not self.debug:
-                    print(f"saving {heatmap} heatmap...", end=" ")
+                image_src = self._get_png_img_bytes(driver=driver)
                 self._save_png_image(image_src=image_src, heatmap=heatmap)
             except (
                 ElementClickInterceptedException,
@@ -85,17 +76,12 @@ class HeatmapScraper(BaseScraper):
                 Exception,
             ) as e:
                 logger.debug(f"*** Error *** {e}")
-                return
             finally:
                 driver.quit()
 
-        if not self.debug:
-            print(f"done,")
-
-
     def _modify_query_time_period(self, heatmap: str) -> str:
         """Use urllib.parse to modify the default query parameters
-        with new heatmap, symbol"""
+        with new heatmap, symbol."""
         parsed_url = urlparse(url=self.base_url)
         query_dict = parse_qs(parsed_url.query)
         query_dict["time"] = heatmap.upper()
@@ -105,13 +91,12 @@ class HeatmapScraper(BaseScraper):
             logger.debug(f"_modify_query_time_period()-> {url}")
         return url
 
-
-    def _return_png_img_bytes(self, driver: object) -> bytes:
+    def _get_png_img_bytes(self, driver: object) -> bytes:
         """Get the chart image source and convert the bytes to PNG image"""
         if self.debug:
-            logger.debug(f"_return_png_img_bytes(driver{driver})")
+            logger.debug(f"_get_png_img_bytes(driver{driver})")
 
-        canvas_element = WebDriverWait(driver=driver, timeout=3).until(
+        canvas_element = WebDriverWait(driver=driver, timeout=10).until(
             EC.presence_of_element_located(
                 (
                     # By.XPATH,
@@ -126,30 +111,22 @@ class HeatmapScraper(BaseScraper):
             logger.debug(f"canvas_element: {canvas_element}, loc: {loc}")
         return canvas_element.screenshot_as_png
 
-
     def _save_png_image(self, image_src: bytes, heatmap: str):
         """Save image to the work directory"""
         if self.debug:
             logger.debug(f"_save_png_image(image_src={type(image_src)}, heatmap={heatmap})")
 
         png_image = Image.open(BytesIO(image_src)).convert("RGB")
-        png_image.save(os.path.join(self.dir, f"SP500_{heatmap.upper()}.png"), "PNG", quality=80)
+        png_image.save(os.path.join(self.work_dir, f"SP500_{heatmap.upper()}.png"), "PNG", quality=80)
 
 
-class StockChartScraper(BaseScraper):
-    """Get stockchart from https://stockcharts.com/sc3/ui/?s=AAPL
-
-        Functions:
-            fetch_stockchart(): Main entry point to class. Directs workflow of webscraper
-    """
-
-    def __init__(self, ctx: dict):
-        super().__init__(ctx=ctx)
-        self.dir = f"{ctx['work_dir']}/chart"
-        self.chart_pool = ctx['chart_pool']
+def main(ctx: dict):
+    logger.debug(f"main(ctx={ctx})")
+    webscraper = WebScraper(ctx=ctx)
+    webscraper.fetch_heatmap()
 
 
-    def fetch_stockchart(self):
-        """Main entry point to class. Directs workflow of Webscraper"""
-        if self.debug:
-            logger.debug(f"fetch_stockchart(self={self})")
+if __name__ == "__main__":
+    logger.debug(f"******* START - beta/beta.py *******")
+
+    main(ctx=ctx)

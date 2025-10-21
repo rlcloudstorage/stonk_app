@@ -106,21 +106,15 @@ def data(ctx, arg, opt):
     match opt:
 
         case "ohlc":
-
             if not ctx.obj["debug"]:
                 click.echo(f"\n- start:")
-
             agent.fetch_ohlc_data(ctx=ctx.obj)
-
             if not ctx.obj["debug"]:
                 click.echo("- finished!\n")
 
         case "signal":
-
             if not ctx.obj["debug"]:
                 click.echo(f"\n- start:")
-
             agent.fetch_signal_data(ctx=ctx.obj)
-
             if not ctx.obj["debug"]:
                 click.echo("- finished!\n")
