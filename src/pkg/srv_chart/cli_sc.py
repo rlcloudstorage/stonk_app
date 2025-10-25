@@ -48,20 +48,36 @@ DESCRIPTION
     flag_value="weekly",
     help="Fetch only weekly charts"
 )
-@click.argument("arg", nargs=1, default=None, required=False)
+@click.argument("arg", nargs=-1, default=None, required=False)
 
 @click.pass_context
 def chart(ctx, arg, opt):
     """Download and save online stockcharts"""
 
+    if ctx.obj["debug"]:
+        click_logger(ctx=ctx, logger=logger)
+    click.echo(f"\n*** current_context: {click.get_current_context().obj}")
+
     if arg:  # use provided arguments
-        ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
+        ctx.obj[f"{ctx.info_name}_pool"] = [i.upper() for i in arg]
     else:  # try default arguments
         try:
             ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
         except:
             click.echo(f" No default stockchart pool is set, try 'stonk-app config --help'\n")
             return
+
+    # Convert option flag_value to a list
+    period_dict = {
+        "all": ["Daily", "Weekly"],
+        "daily": ["Daily",],
+        "weekly": ["Weekly",],
+    }
+    # Add 'opt_trans' to 'interface' ctx
+    if not opt:  # set default value to daily
+        ctx.obj["period"] = period_dict["daily"]
+    else:  # use period_dict value
+        ctx.obj["period"] = period_dict[opt]
 
     ctx.obj["command"] = ctx.info_name
     ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")

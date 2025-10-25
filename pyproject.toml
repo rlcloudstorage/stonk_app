@@ -46,7 +46,7 @@ dependencies = [
 # dependencies). Users will be able to install these using the "extras"
 # syntax, for example:
 #   $ pip install sampleproject[dev]
-dev = ["black", "coverage", "flake8", "pytest"]
+dev = ["black", "coverage", "flake8", "pytest", "pytest-mock"]
 
 [project.urls]
 "Source" = "https://github.com/rlcloudstorage/stonk_app"
@@ -66,7 +66,7 @@ target-version = ['py3']
 #target-version = ['py311']
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "srv_chart", "srv_data",]
+testpaths = ["tests", "cli", "srv_chart", "srv_data",]
 
 [tool.coverage.run]
 branch = true

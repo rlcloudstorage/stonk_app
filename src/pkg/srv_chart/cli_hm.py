@@ -40,6 +40,7 @@ DESCRIPTION
 @click.pass_context
 def heatmap(ctx, arg):
     """Download and save S&P heatmaps"""
+    print(f"\n*** ctx: {ctx} arg: {arg} {type(arg)}")
 
     if arg:  # use provided arguments
         ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
@@ -64,7 +65,3 @@ def heatmap(ctx, arg):
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")
-
-
-if __name__ == "__main__":
-    heatmap()
