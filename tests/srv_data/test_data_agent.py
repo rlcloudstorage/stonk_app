@@ -17,6 +17,7 @@ def test_tiingo_fetch_ohlc_data_processor():
     processor = _select_data_processor(ctx=ctx)
     assert isinstance(processor, TiingoDataProcessor)
 
+
 def test_tiingo_fetch_signal_data_processor():
     ctx = {
         'debug': True,

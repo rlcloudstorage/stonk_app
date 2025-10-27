@@ -16,7 +16,7 @@ from PIL import Image
 
 from selenium.webdriver import Firefox, FirefoxOptions
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
@@ -71,7 +71,7 @@ class HeatmapScraper(BaseScraper):
                 print(f"fetching {heatmap} heatmap...", end="\r", flush=True)
             try:
                 driver = Firefox(options=self.options)
-                mod_url = self._modify_query_time_period(heatmap=heatmap)
+                mod_url = self._modify_heatmap_query_time_period(heatmap=heatmap)
                 driver.get(mod_url)
                 image_src = self._return_png_img_bytes(driver=driver)
                 if not self.debug:
@@ -92,7 +92,7 @@ class HeatmapScraper(BaseScraper):
             print("done,")
 
 
-    def _modify_query_time_period(self, heatmap: str) -> str:
+    def _modify_heatmap_query_time_period(self, heatmap: str) -> str:
         """Use urllib.parse to modify the default query parameters
         with new heatmap, symbol"""
         parsed_url = urlparse(url=self.base_url)
@@ -101,7 +101,7 @@ class HeatmapScraper(BaseScraper):
         encoded_params = urlencode(query_dict, doseq=True)
         url = urlunparse(parsed_url._replace(query=encoded_params))
         if self.debug:
-            logger.debug(f"_modify_query_time_period()-> {url}")
+            logger.debug(f"_modify_heatmap_query_time_period()-> {url}")
         return url
 
 
@@ -154,15 +154,14 @@ class StockChartScraper(BaseScraper):
         if self.debug:
             logger.debug(f"fetch_stockchart(self={self})")
 
-        # driver = Firefox(options=self.options)
-        # driver.get(self.base_url)
+        driver = Firefox(options=self.options)
+        driver.get(self.base_url)
         try:
-        #     self._set_indicator_RSI(driver=driver)
-        #     self._set_chart_size_landscape(driver=driver)
+            self._set_indicator_RSI(driver=driver)
+            self._set_chart_size_landscape(driver=driver)
         #     self._set_chart_color_dark(driver=driver)
         #     # self._click_update_button(driver=driver)
         #     self.url = self._get_chart_src_attribute(driver=driver)
-            self.url = "https://stockcharts.com/c-sc/sc?s=AAPL&p=D&yr=1&mn=0&dy=0&i=t4069132169c&r=1761523033308"
         except (
             ElementClickInterceptedException,
             ElementNotInteractableException,
@@ -171,25 +170,56 @@ class StockChartScraper(BaseScraper):
         ) as e:
             logger.debug(f"*** Error *** {e}")
             return
-        # finally:
-        #     driver.quit()
+        finally:
+            driver.quit()
 
         for chart in self.chart_pool:
             for period in self.period:
                 if not self.debug:
                     print(f"fetching {chart} {period}...", end="\r", flush=True)
 
-                mod_url = self._modify_query_period_and_symbol(chart=chart, period=period)
-                print(f"\n*** mod_url = {mod_url}")
+                mod_url = self._modify_chart_query_period_and_symbol(chart=chart, period=period)
                 # self._get_img_src_convert_bytes_to_png_and_save(url=mod_url, chart=chart, period=period)
 
 
-    def _modify_query_period_and_symbol(self, chart: str, period: str) -> str:
+    def _set_chart_size_landscape(self, driver: object):
+        """set chart size to Landscape"""
+        size_element = WebDriverWait(driver=driver, timeout=10).until(
+            EC.element_to_be_clickable((By.XPATH, '//*[@id="chart-settings-chart-size-menu"]'))
+        )
+        loc = size_element.location_once_scrolled_into_view
+        if self.debug:
+            logger.debug(f"size_element: {size_element}, loc: {loc}")
+
+        size = Select(size_element)
+        size.select_by_value("Landscape")
+        if self.debug:
+            logger.debug(f"size: {size}")
+
+
+    def _set_indicator_RSI(self, driver: object):
+        """set indicator overlay toRSI"""
+        indicator_element = WebDriverWait(driver=driver, timeout=10).until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    "#indicator-menu-1",
+                    # By.XPATH,
+                    # '//*[@id="indicator-menu-1"]'
+                )
+            )
+        )
+        loc = indicator_element.location_once_scrolled_into_view
+        if self.debug:
+            logger.debug(f"indicator_element: {indicator_element}, loc: {loc}")
+
+
+    def _modify_chart_query_period_and_symbol(self, chart: str, period: str) -> str:
         """Use urllib.parse to modify the default query parameters
         with new chart, period
         """
         if self.debug:
-            logger.debug(f"_modify_query_period_and_symbol(chart={chart} {type(chart)}, period={period} {type(period)})")
+            logger.debug(f"_modify_chart_query_period_and_symbol(chart={chart} {type(chart)}, period={period} {type(period)})")
 
         parsed_url = urlparse(url=self.url)
         query_dict = parse_qs(parsed_url.query)
@@ -198,8 +228,10 @@ class StockChartScraper(BaseScraper):
             query_dict["yr"] = "5"
         query_dict["s"] = chart
         encoded_params = urlencode(query_dict, doseq=True)
-
-        return urlunparse(parsed_url._replace(query=encoded_params))
+        url = urlunparse(parsed_url._replace(query=encoded_params))
+        if self.debug:
+            logger.debug(f"_modify_chart_query_period_and_symbol()-> {url}")
+        return url
 
 
 
@@ -259,7 +291,7 @@ class StockChartScraper(BaseScraper):
     #         for period in self.period:
     #             if not DEBUG:
     #                 print(f"  fetching {symbol} {period}...")
-    #             mod_url = self._modify_query_period_and_symbol(period=period, symbol=symbol)
+    #             mod_url = self._modify_chart_query_period_and_symbol(period=period, symbol=symbol)
     #             self._get_img_src_convert_bytes_to_png_and_save(url=mod_url, period=period, symbol=symbol)
 
     # def _get_chart_src_attribute(self, driver: object) -> str:
@@ -300,13 +332,13 @@ class StockChartScraper(BaseScraper):
     #     image = Image.open(io.BytesIO(image_src.data)).convert("RGB")
     #     image.save(os.path.join(self.chart_dir, f"{symbol}_{period[:1].lower()}.png"), "PNG", quality=80)
 
-    # def _modify_query_period_and_symbol(self, period: str, symbol: str) -> str:
+    # def _modify_chart_query_period_and_symbol(self, period: str, symbol: str) -> str:
     #     """Use urllib.parse to modify the default query parameters
     #     with new period, symbol.
     #     """
     #     if DEBUG:
     #         logger.debug(
-    #             f"_modify_query_period_and_symbol(period={period} {type(period)}, symbol={symbol} {type(symbol)})"
+    #             f"_modify_chart_query_period_and_symbol(period={period} {type(period)}, symbol={symbol} {type(symbol)})"
     #         )
 
     #     parsed_url = urlparse(url=self.url)

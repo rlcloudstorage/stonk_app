@@ -10,7 +10,6 @@ def runner():
     return CliRunner()
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
 def test_help_option(runner):
     result = runner.invoke(chart, ["--help"])
     assert "chart" in result.output
