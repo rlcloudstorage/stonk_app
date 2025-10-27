@@ -1,7 +1,7 @@
 import click, pytest
 from click.testing import CliRunner
 
-from pkg.srv_chart import cli_sc
+from pkg.srv_chart import agent
 from pkg.srv_chart.cli_sc import chart
 
 
@@ -9,38 +9,41 @@ from pkg.srv_chart.cli_sc import chart
 def runner():
     return CliRunner()
 
+
+# @pytest.mark.skip(reason="no way of currently testing this")
 def test_help_option(runner):
-    result = runner.invoke(cli_sc.chart, ["--help"])
+    result = runner.invoke(chart, ["--help"])
     assert "chart" in result.output
     assert result.exit_code == 0
 
-class TestContext:
-    def __init__(self):
-        self.info_name = "chart"
-        self.obj = {"debug": True}
 
-    def __iter__(self):
-        return self
+def test_fetch_stockchart_called_with_arg(mocker):
+    call_dict = {
+        'debug': True,
+        'chart_pool': ['AAA', 'BBB'],
+        'period': ['Daily'],
+        'url': 'https://stockcharts.com/sc3/ui/?s=AAPL',
+        'work_dir': '/home/la/dev/rl/stonk_app/work_dir'
+     }
+    arg = ('aaa', 'bbb')
+    opt = None
+    fetch_stockchart_spy = mocker.spy(agent, "fetch_stockchart")
+    ctx = click.Context(command=chart, info_name="chart", obj={"debug": True})
+    ctx.invoke(chart, arg=arg, opt=opt)
+    fetch_stockchart_spy.assert_called_once_with(call_dict)
 
-    def __next__(self):
-        pass
 
-
-@pytest.mark.skip(reason="no way of currently testing this")
-def test_command_with_no_args_returns_defaults():
-
-    ctx = TestContext()
-    print(f"\n*** ctx.obj: {ctx.obj}")
-
-    # ctx = click.Context(command=cli_sc.chart, obj={"debug": True})
+def test_fetch_stockchart_called_without_arg(mocker):
+    call_dict = {
+        'debug': True,
+        'chart_pool': ['YANG', 'YINN'],
+        'period': ['Daily'],
+        'url': 'https://stockcharts.com/sc3/ui/?s=AAPL',
+        'work_dir': '/home/la/dev/rl/stonk_app/work_dir'
+    }
     arg = ()
     opt = None
-    # with ctx as iter(ctx):
-    click.echo(f"\n*** ctx: {ctx} {type(ctx)}")
-        # expected = None
-    chart(ctx)
-        # expected = {'debug': True}
-        # result = process_cmd()
-
-    click.echo(f"\n*** ctx.obj: {ctx.obj} {type(ctx.obj)}")
-        # assert ctx.obj == expected
+    fetch_stockchart_spy = mocker.spy(agent, "fetch_stockchart")
+    ctx = click.Context(command=chart, info_name="chart", obj={"debug": True})
+    ctx.invoke(chart, arg=arg, opt=opt)
+    fetch_stockchart_spy.assert_called_once_with(call_dict)

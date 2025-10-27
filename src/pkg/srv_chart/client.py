@@ -36,7 +36,7 @@ class BaseScraper:
     def __init__(self, ctx):
         self.debug = ctx["debug"]
         self.base_url = ctx["url"]
-        self.command = ctx["command"]
+        # self.command = ctx["command"]
         self.options = FirefoxOptions()
         self.options.add_argument("--disable-notifications")
         self.options.add_argument("--headless=new")
@@ -69,27 +69,27 @@ class HeatmapScraper(BaseScraper):
         for heatmap in self.heatmap_pool:
             if not self.debug:
                 print(f"fetching {heatmap} heatmap...", end="\r", flush=True)
-            # try:
-            #     driver = Firefox(options=self.options)
-            #     mod_url = self._modify_query_time_period(heatmap=heatmap)
-            #     driver.get(mod_url)
-            #     image_src = self._return_png_img_bytes(driver=driver)
-            #     if not self.debug:
-            #         print(f"saving {heatmap} heatmap...", end=" ")
-            #     self._save_png_image(image_src=image_src, heatmap=heatmap)
-            # except (
-            #     ElementClickInterceptedException,
-            #     ElementNotInteractableException,
-            #     TimeoutException,
-            #     Exception,
-            # ) as e:
-            #     logger.debug(f"*** Error *** {e}")
-            #     return
-            # finally:
-            #     driver.quit()
+            try:
+                driver = Firefox(options=self.options)
+                mod_url = self._modify_query_time_period(heatmap=heatmap)
+                driver.get(mod_url)
+                image_src = self._return_png_img_bytes(driver=driver)
+                if not self.debug:
+                    print(f"saving {heatmap} heatmap...", end=" ")
+                self._save_png_image(image_src=image_src, heatmap=heatmap)
+            except (
+                ElementClickInterceptedException,
+                ElementNotInteractableException,
+                TimeoutException,
+                Exception,
+            ) as e:
+                logger.debug(f"*** Error *** {e}")
+                return
+            finally:
+                driver.quit()
 
         if not self.debug:
-            print(f"done,")
+            print("done,")
 
 
     def _modify_query_time_period(self, heatmap: str) -> str:
@@ -162,7 +162,7 @@ class StockChartScraper(BaseScraper):
         #     self._set_chart_color_dark(driver=driver)
         #     # self._click_update_button(driver=driver)
         #     self.url = self._get_chart_src_attribute(driver=driver)
-            self.url = "test url"
+            self.url = "https://stockcharts.com/c-sc/sc?s=AAPL&p=D&yr=1&mn=0&dy=0&i=t4069132169c&r=1761523033308"
         except (
             ElementClickInterceptedException,
             ElementNotInteractableException,
@@ -180,16 +180,16 @@ class StockChartScraper(BaseScraper):
                     print(f"fetching {chart} {period}...", end="\r", flush=True)
 
                 mod_url = self._modify_query_period_and_symbol(chart=chart, period=period)
+                print(f"\n*** mod_url = {mod_url}")
                 # self._get_img_src_convert_bytes_to_png_and_save(url=mod_url, chart=chart, period=period)
+
 
     def _modify_query_period_and_symbol(self, chart: str, period: str) -> str:
         """Use urllib.parse to modify the default query parameters
         with new chart, period
         """
         if self.debug:
-            logger.debug(
-                f"_modify_query_period_and_symbol(chart={chart} {type(chart)}, period={period} {type(period)})"
-            )
+            logger.debug(f"_modify_query_period_and_symbol(chart={chart} {type(chart)}, period={period} {type(period)})")
 
         parsed_url = urlparse(url=self.url)
         query_dict = parse_qs(parsed_url.query)

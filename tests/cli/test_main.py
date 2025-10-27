@@ -53,5 +53,3 @@ def test_main_cli_heatmap_command(runner):
     result = runner.invoke(group, ["heatmap", "--help"])
     assert "heatmap" in result.output
     assert result.exit_code == 0
-
-    # print(f"result.output: {result.output}")

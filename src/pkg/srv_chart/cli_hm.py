@@ -51,7 +51,7 @@ def heatmap(ctx, arg):
             click.echo(f" No default heatmap pool is set, try 'stonk-app config --help'\n")
             return
 
-    ctx.obj["command"] = ctx.info_name
+    # ctx.obj["command"] = ctx.info_name
     ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 

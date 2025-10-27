@@ -54,10 +54,6 @@ DESCRIPTION
 def chart(ctx, arg, opt):
     """Download and save online stockcharts"""
 
-    if ctx.obj["debug"]:
-        click_logger(ctx=ctx, logger=logger)
-    click.echo(f"\n*** current_context: {click.get_current_context().obj}")
-
     if arg:  # use provided arguments
         ctx.obj[f"{ctx.info_name}_pool"] = [i.upper() for i in arg]
     else:  # try default arguments
@@ -79,7 +75,7 @@ def chart(ctx, arg, opt):
     else:  # use period_dict value
         ctx.obj["period"] = period_dict[opt]
 
-    ctx.obj["command"] = ctx.info_name
+    # ctx.obj["command"] = ctx.info_name
     ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 
@@ -93,13 +89,6 @@ def chart(ctx, arg, opt):
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")
-
-    # # Convert option flag_value to a list
-    # period_dict = {
-    #     "all": ["Daily", "Weekly"],
-    #     "daily": ["Daily",],
-    #     "weekly": ["Weekly",],
-    # }
 
     # # Add 'opt_trans' to 'interface' ctx
     # if opt == None:  # set default value to daily
@@ -151,7 +140,3 @@ def chart(ctx, arg, opt):
 
 #     else:  # Print default message
 #         click.echo("Goodby.")
-
-
-if __name__ == "__main__":
-    chart()
