@@ -1,7 +1,7 @@
 """
-src/pkg/srv_chart/agent.py
--------------------------
-Manage stock chart and heatmap download
+src/pkg/srv_scrape/agent.py
+---------------------------
+Manage the stock chart and heatmap scrapers
 
 Functions:
     fetch_heatmap(): Entry point for S&P heatmap scraper
@@ -22,7 +22,7 @@ def fetch_heatmap(ctx: dict) -> None:
     Returns:
         None:
     """
-    from pkg.srv_chart.client import HeatmapScraper
+    from pkg.srv_scrape.client import HeatmapScraper
 
     if ctx["debug"]:
         logger.debug(f"fetch_heatmap(ctx={ctx} {type(ctx)}")
@@ -40,7 +40,7 @@ def fetch_stockchart(ctx: dict) -> None:
     Returns:
         None:
     """
-    from pkg.srv_chart.client import StockChartScraper
+    from pkg.srv_scrape.client import StockChartScraper
 
     if ctx["debug"]:
         logger.debug(f"fetch_stockchart(ctx={ctx} {type(ctx)}")

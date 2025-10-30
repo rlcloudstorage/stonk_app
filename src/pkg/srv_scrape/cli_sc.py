@@ -1,5 +1,5 @@
 """
-pkg/srv_chart/cli.py
+pkg/srv_scrape/cli.py
 -------------------
 CLI for chart service
 
@@ -11,7 +11,7 @@ import logging
 import click
 
 from pkg import click_logger, config_obj
-from pkg.srv_chart import agent
+from pkg.srv_scrape.agent import fetch_stockchart
 
 
 logger = logging.getLogger(__name__)
@@ -55,12 +55,13 @@ def chart(ctx, arg, opt):
     """Download and save online stockcharts"""
 
     if arg:  # use provided arguments
-        ctx.obj[f"{ctx.info_name}_pool"] = [i.upper() for i in arg]
+        ctx.obj["item_pool"] = [i.upper() for i in arg]
+        # ctx.obj[f"{ctx.info_name}_pool"] = [i.upper() for i in arg]
     else:  # try default arguments
         try:
-            ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
+            ctx.obj["item_pool"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
         except:
-            click.echo(f" No default stockchart pool is set, try 'stonk-app config --help'\n")
+            click.echo(f" No default {ctx.info_name} pool is set, try 'stonk-app config --help'\n")
             return
 
     # Convert option flag_value to a list
@@ -75,7 +76,7 @@ def chart(ctx, arg, opt):
     else:  # use period_dict value
         ctx.obj["period"] = period_dict[opt]
 
-    # ctx.obj["command"] = ctx.info_name
+    ctx.obj["command"] = ctx.info_name
     ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 
@@ -85,7 +86,7 @@ def chart(ctx, arg, opt):
     if not ctx.obj["debug"]:
         click.echo(f"\n- start:")
 
-    agent.fetch_stockchart(ctx=ctx.obj)
+    fetch_stockchart(ctx=ctx.obj)
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")

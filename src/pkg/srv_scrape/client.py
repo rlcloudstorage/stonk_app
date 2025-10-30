@@ -37,6 +37,8 @@ class BaseScraper:
         self.debug = ctx["debug"]
         self.base_url = ctx["url"]
         # self.command = ctx["command"]
+        self.dir = f"{ctx['work_dir']}/{ctx['command']}"
+        self.item_pool = ctx["item_pool"]
         self.options = FirefoxOptions()
         self.options.add_argument("--disable-notifications")
         self.options.add_argument("--headless=new")
@@ -57,8 +59,6 @@ class HeatmapScraper(BaseScraper):
 
     def __init__(self, ctx: dict):
         super().__init__(ctx=ctx)
-        self.dir = f"{ctx['work_dir']}/heatmap"
-        self.heatmap_pool = ctx['heatmap_pool']
 
 
     def fetch_heatmap(self):
@@ -66,17 +66,17 @@ class HeatmapScraper(BaseScraper):
         if self.debug:
             logger.debug(f"fetch_heatmap(self={self})")
 
-        for heatmap in self.heatmap_pool:
+        for item in self.item_pool:
             if not self.debug:
-                print(f"fetching {heatmap} heatmap...", end="\r", flush=True)
+                print(f"fetching {item} heatmap...", end="\r", flush=True)
             try:
                 driver = Firefox(options=self.options)
-                mod_url = self._modify_heatmap_query_time_period(heatmap=heatmap)
+                mod_url = self._modify_heatmap_query_time_period(heatmap=item)
                 driver.get(mod_url)
                 image_src = self._return_png_img_bytes(driver=driver)
                 if not self.debug:
-                    print(f"saving {heatmap} heatmap...", end=" ")
-                self._save_png_image(image_src=image_src, heatmap=heatmap)
+                    print(f"saving {item} heatmap...", end=" ")
+                self._save_png_image(image_src=image_src, heatmap=item)
             except (
                 ElementClickInterceptedException,
                 ElementNotInteractableException,
@@ -144,8 +144,6 @@ class StockChartScraper(BaseScraper):
 
     def __init__(self, ctx: dict):
         super().__init__(ctx=ctx)
-        self.dir = f"{ctx['work_dir']}/chart"
-        self.chart_pool = ctx["chart_pool"]
         self.period = ctx["period"]
 
 
@@ -154,32 +152,32 @@ class StockChartScraper(BaseScraper):
         if self.debug:
             logger.debug(f"fetch_stockchart(self={self})")
 
-        driver = Firefox(options=self.options)
-        driver.get(self.base_url)
-        try:
-            self._set_indicator_RSI(driver=driver)
-            self._set_chart_size_landscape(driver=driver)
+        # driver = Firefox(options=self.options)
+        # driver.get(self.base_url)
+        # try:
+        #     self._set_indicator_RSI(driver=driver)
+        #     self._set_chart_size_landscape(driver=driver)
         #     self._set_chart_color_dark(driver=driver)
         #     # self._click_update_button(driver=driver)
         #     self.url = self._get_chart_src_attribute(driver=driver)
-        except (
-            ElementClickInterceptedException,
-            ElementNotInteractableException,
-            TimeoutException,
-            Exception
-        ) as e:
-            logger.debug(f"*** Error *** {e}")
-            return
-        finally:
-            driver.quit()
+        # except (
+        #     ElementClickInterceptedException,
+        #     ElementNotInteractableException,
+        #     TimeoutException,
+        #     Exception
+        # ) as e:
+        #     logger.debug(f"*** Error *** {e}")
+        #     return
+        # finally:
+        #     driver.quit()
 
-        for chart in self.chart_pool:
-            for period in self.period:
-                if not self.debug:
-                    print(f"fetching {chart} {period}...", end="\r", flush=True)
+        # for item in self.item_pool:
+        #     for period in self.period:
+        #         if not self.debug:
+        #             print(f"fetching {item} {period}...", end="\r", flush=True)
 
-                mod_url = self._modify_chart_query_period_and_symbol(chart=chart, period=period)
-                # self._get_img_src_convert_bytes_to_png_and_save(url=mod_url, chart=chart, period=period)
+        #         mod_url = self._modify_chart_query_period_and_symbol(chart=item, period=period)
+        #         # self._get_img_src_convert_bytes_to_png_and_save(url=mod_url, chart=chart, period=period)
 
 
     def _set_chart_size_landscape(self, driver: object):

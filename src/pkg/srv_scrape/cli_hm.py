@@ -1,5 +1,5 @@
 """
-pkg/srv_chart/cli_heatmap.py
+pkg/srv_scrape/cli_heatmap.py
 ----------------------------
 CLI for heatmap service
 
@@ -11,7 +11,7 @@ import logging
 import click
 
 from pkg import click_logger, config_obj
-from pkg.srv_chart import agent
+from pkg.srv_scrape.agent import fetch_heatmap
 
 
 logger = logging.getLogger(__name__)
@@ -43,15 +43,17 @@ def heatmap(ctx, arg):
     print(f"\n*** ctx: {ctx} arg: {arg} {type(arg)}")
 
     if arg:  # use provided arguments
-        ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
+        ctx.obj["item_pool"] = list(arg)
+        # ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
     else:  # try default arguments
         try:
-            ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
+            ctx.obj["item_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
+            # ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
         except:
-            click.echo(f" No default heatmap pool is set, try 'stonk-app config --help'\n")
+            click.echo(f" No default {ctx.info_name} pool is set, try 'stonk-app config --help'\n")
             return
 
-    # ctx.obj["command"] = ctx.info_name
+    ctx.obj["command"] = ctx.info_name
     ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 
@@ -61,7 +63,7 @@ def heatmap(ctx, arg):
     if not ctx.obj["debug"]:
         click.echo(f"\n- start:")
 
-    agent.fetch_heatmap(ctx=ctx.obj)
+    fetch_heatmap(ctx=ctx.obj)
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")

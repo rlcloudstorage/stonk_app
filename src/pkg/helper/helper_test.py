@@ -1,9 +1,43 @@
 import sqlite3
-
 from pathlib import Path
 
-from pkg.helper import utils
+from pkg.helper import ctx_mgr, utils
 
+
+# ===== ctx_mgr.py =====
+
+def test_ctx_mgr_spinner_manager(capsys):
+    ctx = {'database': 'test_db', 'debug': True, }
+    with ctx_mgr.SpinnerManager(debug=ctx["debug"]):
+        out, err = capsys.readouterr()
+        if err:
+            print(f"\n*** Error *** {err}")
+        assert "|" in out
+
+
+def test_ctx_mgr_sqlite_con_mgr_in_memory_mode():
+    ctx = {'database': 'test_db', 'debug': True, }
+    db_table = 'data'
+    rows = [('D1','F1'), ('D2','F2'), ('D3','F3'),]
+
+    with ctx_mgr.SqliteConnectManager(ctx=ctx, mode='memory') as db:
+        db.cursor.execute(f'''
+            CREATE TABLE {db_table} (
+                Date    DATE        NOT NULL,
+                Field   INTEGER     NOT NULL,
+                PRIMARY KEY (Date)
+            );
+        ''')
+        db.cursor.executemany(f'INSERT INTO {db_table} VALUES (?,?)', rows)
+        try:
+            sql = db.cursor.execute(f"SELECT Field FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
+            result = sql.fetchone()
+        except Exception as e:
+            print(f"{e}")
+        assert "F3" in result
+
+
+# ===== utils.py =====
 
 # fake config file
 CONTENT = ("""
@@ -69,6 +103,3 @@ def test_create_ohlc_database(tmp_path):
         assert [i[0] for i in cur.description] == ['datetime', 'open', 'high', 'low', 'close', 'volume']
 
     Path.unlink("temp.db")
-
-
-# print(f"result.output: {result.output}")
