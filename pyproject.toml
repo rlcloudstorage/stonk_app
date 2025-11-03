@@ -72,6 +72,7 @@ testpaths = [
   "src/pkg/srv_data",
   "src/pkg/srv_scrape",
 ]
+markers = []
 
 [tool.coverage.run]
 branch = true

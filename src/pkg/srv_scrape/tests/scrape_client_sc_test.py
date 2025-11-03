@@ -1,5 +1,3 @@
-import pytest
-
 from pkg.srv_scrape.client import StockChartScraper
 
 
@@ -7,7 +5,7 @@ class TestStockchartScraper:
     """"""
     ctx = {
         'debug': True,
-        'item_pool': ['YANG', 'YINN'],
+        'item_list': ['YANG', 'YINN'],
         'period': ['Daily', 'Weekly'],
         'command': 'chart',
         'url': 'https://stockcharts.com/sc3/ui/?s=AAPL',

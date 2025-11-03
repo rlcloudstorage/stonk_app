@@ -7,7 +7,7 @@ class TestHeatmapScraper:
     """"""
     ctx = {
         'debug': True,
-        'item_pool': ['1d', '1w'],
+        'item_list': ['1d', '1w'],
         'command': 'heatmap',
         'url': 'https://stockanalysis.com/markets/heatmap/',
         'work_dir': '/home/la/dev/rl/stonk_app/work_dir'
@@ -20,7 +20,7 @@ class TestHeatmapScraper:
         webscraper = HeatmapScraper(ctx=self.ctx)
         mock_expected = "https://stockanalysis.com/markets/heatmap/?time=1D"
         mocker.patch.object(webscraper, "_modify_heatmap_query_time_period", return_value=mock_expected)
-        assert self.webscraper._modify_heatmap_query_time_period(heatmap="1d") == mock_expected
+        assert self.webscraper._modify_heatmap_query_time_period(period="1d") == mock_expected
 
 
     @pytest.mark.skip("42")

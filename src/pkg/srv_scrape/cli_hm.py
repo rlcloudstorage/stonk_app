@@ -40,15 +40,12 @@ DESCRIPTION
 @click.pass_context
 def heatmap(ctx, arg):
     """Download and save S&P heatmaps"""
-    print(f"\n*** ctx: {ctx} arg: {arg} {type(arg)}")
 
     if arg:  # use provided arguments
-        ctx.obj["item_pool"] = list(arg)
-        # ctx.obj[f"{ctx.info_name}_pool"] = list(arg)
+        ctx.obj["item_list"] = list(arg)
     else:  # try default arguments
         try:
-            ctx.obj["item_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
-            # ctx.obj[f"{ctx.info_name}_pool"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
+            ctx.obj["item_list"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
         except:
             click.echo(f" No default {ctx.info_name} pool is set, try 'stonk-app config --help'\n")
             return
@@ -61,7 +58,7 @@ def heatmap(ctx, arg):
         click_logger(ctx=ctx, logger=logger)
 
     if not ctx.obj["debug"]:
-        click.echo(f"\n- start:")
+        click.echo(f"\n- start webdriver:")
 
     fetch_heatmap(ctx=ctx.obj)
 

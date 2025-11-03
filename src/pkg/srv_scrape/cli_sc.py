@@ -16,6 +16,7 @@ from pkg.srv_scrape.agent import fetch_stockchart
 
 logger = logging.getLogger(__name__)
 
+
 @click.command(
     "chart",
     short_help="Download and save online stock charts",
@@ -55,11 +56,11 @@ def chart(ctx, arg, opt):
     """Download and save online stockcharts"""
 
     if arg:  # use provided arguments
-        ctx.obj["item_pool"] = [i.upper() for i in arg]
+        ctx.obj["item_list"] = [i.upper() for i in arg]
         # ctx.obj[f"{ctx.info_name}_pool"] = [i.upper() for i in arg]
     else:  # try default arguments
         try:
-            ctx.obj["item_pool"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
+            ctx.obj["item_list"] = (config_obj.get(section=ctx.info_name, option=f"{ctx.info_name}_pool")).upper().split()
         except:
             click.echo(f" No default {ctx.info_name} pool is set, try 'stonk-app config --help'\n")
             return
@@ -84,7 +85,7 @@ def chart(ctx, arg, opt):
         click_logger(ctx=ctx, logger=logger)
 
     if not ctx.obj["debug"]:
-        click.echo(f"\n- start:")
+        click.echo(f"\n- start webdriver:")
 
     fetch_stockchart(ctx=ctx.obj)
 
