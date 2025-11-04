@@ -1,6 +1,11 @@
-"""src/pkg/ctx_mgr.py\n
-class SpinnerManager - spinner for command line\n
-class SqliteConnectManager - sqlite3
+"""
+src/pkg/helper/ctx_mgr.py
+-------------------------
+All classes inherit from BaseProcessor class
+
+Class:
+    SpinnerManager(): Context manager for CLI spinner object
+    SqliteConnectManager(): Context manager for Sqlite3 database
 """
 
 import logging

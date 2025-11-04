@@ -24,7 +24,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.command(
     name="config",
-    short_help="Edit configuration settings.",
+    short_help="Edit configuration settings",
     help="""
 \b
 NAME

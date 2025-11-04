@@ -1,6 +1,6 @@
 """
-pkg/srv_scrape/cli_heatmap.py
-----------------------------
+pkg/srv_scrape/cli_hm.py
+------------------------
 CLI for heatmap service
 
 Functions:
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @click.command(
     "heatmap",
-    short_help="Download and save S & P heatmaps",
+    short_help="Download and save S&P heatmaps",
     help="""
 \b
 NAME

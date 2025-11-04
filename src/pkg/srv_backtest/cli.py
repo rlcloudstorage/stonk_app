@@ -1,5 +1,11 @@
-"""src/pkg/srv_backtest/interface.py\n
-def backtest(ctx)"""
+"""
+pkg/srv_backtest/cli.py
+-----------------------
+CLI for backtest service
+
+Functions:
+    backtest(): entry point for backtest service
+"""
 import logging
 
 import click
@@ -11,7 +17,7 @@ logger = logging.getLogger(__name__)
 @click.command()
 @click.pass_context
 def backtest(ctx):
-    """Prints a greeting."""
+    """Prints a greeting"""
     if ctx.obj["debug"]:
         logger.debug(
             f" backtest(ctx={ctx} {type(ctx)})\n"

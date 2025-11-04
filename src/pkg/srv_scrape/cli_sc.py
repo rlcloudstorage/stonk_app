@@ -1,10 +1,10 @@
 """
-pkg/srv_scrape/cli.py
--------------------
+pkg/srv_scrape/cli_sc.py
+------------------------
 CLI for chart service
 
 Functions:
-    chart(): entry point for chart service
+    chart(): Download and save online stock charts
 """
 import logging
 
@@ -91,54 +91,3 @@ def chart(ctx, arg, opt):
 
     if not ctx.obj["debug"]:
         click.echo("- finished!\n")
-
-    # # Add 'opt_trans' to 'interface' ctx
-    # if opt == None:  # set default value to daily
-    #     ctx["interface"]["opt_trans"] = period_dict["daily"]
-    # else:  # use period_dict value
-    #     ctx["interface"]["opt_trans"] = period_dict[opt]
-
-
-# def cli(ctx, arguments, opt_trans):
-#     """Run chart command"""
-#     ctx["interface"]["command"] = "chart"
-
-#     if DEBUG:
-#         logger.debug(f"start_cli(ctx={type(ctx)}, arguments={arguments}, opt_trans={opt_trans})")
-
-#     # Add 'arguments' to 'interface' ctx
-#     if arguments:  # download charts in arguments list
-#         ctx["interface"]["arguments"] = sorted([a.upper() for a in list(arguments)])
-#     else:  # use chart_service chart_list
-#         if ctx["chart_service"]["chart_list"]:
-#             ctx["interface"]["arguments"] = sorted(list(ctx["chart_service"]["chart_list"].split(" ")))
-#         else:
-#             try:
-#                 ctx["interface"]["arguments"] = sorted(list(ctx["default"]["chart_list"].split(" ")))
-#             except:
-#                 click.echo(message="Add tickers to chart_list in chart_service/cfg_chart.ini file.")
-
-#     # Convert option flag_value to a list
-#     period_dict = {
-#         "all": ["Daily", "Weekly"],
-#         "daily": ["Daily",],
-#         "weekly": ["Weekly",],
-#     }
-#     # Add 'opt_trans' to 'interface' ctx
-#     if opt_trans == "False":  # set default value to daily
-#         ctx["interface"]["opt_trans"] = period_dict["daily"]
-#     else:  # use period_dict value
-#         ctx["interface"]["opt_trans"] = period_dict[opt_trans]
-
-#     if DEBUG:
-#         logger.debug(f"cli(ctx={ctx})")
-
-#     if click.confirm(
-#         f" Downloading: {ctx['interface']['arguments']}, {ctx['interface']['opt_trans']}\n Do you want to continue?"
-#     ):
-#         # Download charts
-#         from pkg.chart_srv import client
-#         client.begin_chart_download(ctx)
-
-#     else:  # Print default message
-#         click.echo("Goodby.")

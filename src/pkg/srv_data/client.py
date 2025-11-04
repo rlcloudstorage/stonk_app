@@ -1,11 +1,11 @@
 """
 src/pkg/srv_data/client.py
 --------------------------
-Select data provider, create database, download data
+All classes inherit from BaseProcessor class
 
-Functions:
-    download_and_parse_ohlc_data(): save OHLC price and volume data
-    download_and_parse_signal_data(): save signal data
+Class:
+    TiingoDataProcessor(): Fetch ohlc price data from tiingo.com
+    YahooFinanceDataProcessor(): Fetch ohlc price data using yfinance
 """
 import datetime, logging, os, pickle, time
 

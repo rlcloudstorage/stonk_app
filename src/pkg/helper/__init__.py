@@ -1,8 +1,9 @@
 """
 src/pkg/helper
--------------------
+--------------
 Some helper modules
 
 Modules:
-    utils: write new values to config file
+    ctx_mgr: context managers
+    utils: create/write sqlite3 database
 """

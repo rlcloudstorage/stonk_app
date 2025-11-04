@@ -1,7 +1,7 @@
 """
 src/pkg/helper/utils.py
 -----------------------
-Config helper functions,
+Some misc. helper functions
 
 Functions:
     create_ohlc_database(): create an sqlite3 database
