@@ -88,6 +88,8 @@ if not os.path.isfile(config_file):
         # values from .env file (if any)
         if os.getenv("CHART_POOL"):
             config_obj.set(section="chart", option="chart_pool", value=os.getenv("CHART_POOL"))
+        if os.getenv("HEATMAP_POOL"):
+            config_obj.set(section="chart", option="heatmap_pool", value=os.getenv("HEATMAP_POOL"))
         if os.getenv("OHLC_POOL"):
             config_obj.set(section="data", option="ohlc_pool", value=os.getenv("OHLC_POOL"))
         if os.getenv("SIGNAL_POOL"):
