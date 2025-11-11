@@ -1,10 +1,11 @@
 import sqlite3
+import pytest
 from pathlib import Path
 
 from pkg.helper import ctx_mgr, utils
 
 
-# ===== ctx_mgr.py =====
+# ===== ctx_mgr.py tests =====
 
 def test_ctx_mgr_spinner_manager(capsys):
     ctx = {'database': 'test_db', 'debug': True, }
@@ -15,6 +16,7 @@ def test_ctx_mgr_spinner_manager(capsys):
         assert "|" in out
 
 
+# @pytest.mark.skip("42")
 def test_ctx_mgr_sqlite_con_mgr_in_memory_mode():
     ctx = {'database': 'test_db', 'debug': True, }
     db_table = 'data'
@@ -37,16 +39,18 @@ def test_ctx_mgr_sqlite_con_mgr_in_memory_mode():
         assert "F3" in result
 
 
-# ===== utils.py =====
+# ===== utils.py tests =====
 
-# fake config file
-CONTENT = ("""
-[config]
-work_dir = current_dir
-""")
-
+def test_timeshift_dataframe_columns():
+    pass
 
 def test_write_config_file_work_dir_case(tmp_path):
+    # fake config file
+    CONTENT = ("""
+    [config]
+    work_dir = current_dir
+    """)
+
     # create temp config.ini
     temp_dir = tmp_path / "src"
     temp_dir.mkdir()
@@ -84,9 +88,6 @@ def test_create_ohlc_database(tmp_path):
         'debug': True,
         'database': 'temp.db',
         'ohlc_pool': ['aaa', 'bbb'],
-        'frequency': 'daily',
-        'lookback': 42,
-        'provider': 'yfinance'
     }
 
     utils.create_ohlc_database(ctx=ctx)
@@ -101,5 +102,35 @@ def test_create_ohlc_database(tmp_path):
         # check columns
         cur.execute("SELECT * FROM bbb")
         assert [i[0] for i in cur.description] == ['datetime', 'open', 'high', 'low', 'close', 'volume']
+
+    Path.unlink("temp.db")
+
+
+def test_create_data_line_database(tmp_path):
+    # create temp database
+    temp_dir = tmp_path / "data"
+    temp_dir.mkdir()
+    temp_file = temp_dir / "temp.db"
+    assert len(list(tmp_path.iterdir())) == 1
+
+    ctx = {
+        'debug': True,
+        'database': 'temp.db',
+        'line': ['clop', 'clv', 'cwap', 'hilo', 'volume'],
+        'line_pool': ['aaa', 'bbb'],
+    }
+
+    utils.create_data_line_database(ctx=ctx)
+
+    with sqlite3.connect('temp.db') as con:
+        cur = con.cursor()
+
+        # check tables
+        cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        assert cur.fetchall() == [('AAA',), ('BBB',)]
+
+        # check columns
+        cur.execute("SELECT * FROM BBB")
+        assert [i[0] for i in cur.description] == ['datetime', 'clop', 'clv', 'cwap', 'hilo', 'volume']
 
     Path.unlink("temp.db")

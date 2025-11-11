@@ -1,32 +1,27 @@
-# **stonk_app**
+# **stonk-app**
 
 ## **Introduction**
 
-Comand line interface for:
-- Downloading
+A comand line interface for:
+- Backtesting trade strategies
+- Downloading:
   - stock market charts
   - S&P heatmaps
   - OHLC price data
-- Backtesting trade strategies
 
 ## **Installation**
 
-To install stonk_cli, follow these steps:
-
-1. Clone the repository: **`git clone https://github.com/rlcloudstorage/stonk_cli`**
-2. Navigate to the project directory: **`cd stonk_cli`**
-3. Create virtual environmet **`python3.10 -m venv <env name>`**
+1. Clone the repository: **`git clone https://github.com/rlcloudstorage/stonk-app`**
+2. Navigate to the project directory: **`cd stonk-app`**
+3. Create virtual environmet **`python3 -m venv <env name>`**
 4. Install the project: **`pip install -e .`**
-5. Start the project: **`stonk_cli --help`**
+5. Start the app: **`stonk-app --help`**
 
 ## **Usage**
 
-To use stonk_cli, follow these steps:
-
-1. Modify the source code to fit your needs.
-2. Change src/dot_env to src/.env and add your tiing api key.
-3. Try **`stonk_cli config --help`** and edit the default chart, data, etc. lists as needed.
-4. Use the stonk_cli as desired.
+1. Change src/dot_env to src/.env and add your tiingo api key (if using tiingo.com for historical data).
+2. Try **`stonk-app config --help`** and edit the default chart, data, etc. and other options as needed.
+3. Use **stonk-app** at your own risk. Good luck.
 
 <!-- ## **Contributing**
 
@@ -43,11 +38,11 @@ If you'd like to contribute to Project Title, here are some guidelines:
 
 ## **License**
 
-**stonk_cli** is released under the GNU General Public License. See the **[LICENSE](https://www.gnu.org/licenses/gpl-3.0.en.html)** file for details.
+**stonk-app** is released under the GNU General Public License. See the **[LICENSE](https://www.gnu.org/licenses/gpl-3.0.en.html)** file for details.
 
 ## **Authors and Acknowledgment**
 
-Project Title was created by **[Your Name](https://github.com/username)**.
+**stonk-app** was created by **[Your Name](https://github.com/username)**.
 
 Additional contributors include:
 
@@ -85,9 +80,9 @@ Please note that this project is released with a Contributor Code of Conduct. By
 ## **Changelog**
 
 - **0.1.0:** Initial release
-- **0.1.1:** Fixed a bug in the build process
+<!-- - **0.1.1:** Fixed a bug in the build process
 - **0.2.0:** Added a new feature
-- **0.2.1:** Fixed a bug in the new feature
+- **0.2.1:** Fixed a bug in the new feature -->
 
 ## **Contact**
 
@@ -95,4 +90,5 @@ If you have any questions or comments about Project Title, please contact **[You
 
 ## **Conclusion**
 
-That's it! This is a basic template for a proper README file for a general project. You can customize it to fit your needs, but make sure to include all the necessary information. A good README file can help users understand and use your project, and it can also help attract contributors.
+That's it!
+<!-- This is a basic template for a proper README file for a general project. You can customize it to fit your needs, but make sure to include all the necessary information. A good README file can help users understand and use your project, and it can also help attract contributors. -->

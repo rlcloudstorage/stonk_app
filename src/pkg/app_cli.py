@@ -113,8 +113,8 @@ def group(ctx, debug):
 
     if ctx.obj["debug"]:
         click.secho(message=
-            f"    ================ start {config_obj['app']['name']} - src.{__name__} ================\n"
-            f" group(ctx={ctx})\n"
+            f" ================ start {config_obj['app']['name']} - src.{__name__} ================\n"
+            f" - ctx: {ctx}\n"
             f" - ctx.parent: {ctx.parent} {type(ctx.parent)}\n"
             f" - ctx.command: {ctx.command} {type(ctx.command)}\n"
             f" - ctx.info_name: {ctx.info_name} {type(ctx.info_name)}\n"

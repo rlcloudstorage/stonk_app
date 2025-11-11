@@ -16,6 +16,7 @@ from pkg.srv_data import agent
 
 logger = logging.getLogger(__name__)
 
+
 @click.command(
     "data",
     short_help="Database for online stockmarket data",
@@ -55,7 +56,7 @@ DESCRIPTION
 @click.pass_context
 def data(ctx, arg, opt):
     """Download and save online stockmarket data"""
-# TODO no opt case defaults to --ohlc
+# TODO None opt case defaults to --ohlc
 
     if arg:  # use provided arguments
         ctx.obj[f"{opt}_pool"] = arg.upper().split()
