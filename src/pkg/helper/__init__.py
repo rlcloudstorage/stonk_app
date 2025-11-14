@@ -5,5 +5,5 @@ Some helper modules
 
 Modules:
     ctx_mgr: context managers
-    utils: create/write sqlite3 database
+    misc: some misc. db and file utils
 """

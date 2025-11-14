@@ -14,7 +14,7 @@ from pathlib import Path
 import click
 
 from pkg import click_logger, config_obj
-from pkg.helper.utils import write_config_file
+from pkg.helper.misc import write_config_file
 
 
 logger = logging.getLogger(__name__)

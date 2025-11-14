@@ -2,47 +2,8 @@ import sqlite3
 import pytest
 from pathlib import Path
 
-from pkg.helper import ctx_mgr, utils
+from pkg.helper import misc
 
-
-# ===== ctx_mgr.py tests =====
-
-def test_ctx_mgr_spinner_manager(capsys):
-    ctx = {'database': 'test_db', 'debug': True, }
-    with ctx_mgr.SpinnerManager(debug=ctx["debug"]):
-        out, err = capsys.readouterr()
-        if err:
-            print(f"\n*** Error *** {err}")
-        assert "|" in out
-
-
-# @pytest.mark.skip("42")
-def test_ctx_mgr_sqlite_con_mgr_in_memory_mode():
-    ctx = {'database': 'test_db', 'debug': True, }
-    db_table = 'data'
-    rows = [('D1','F1'), ('D2','F2'), ('D3','F3'),]
-
-    with ctx_mgr.SqliteConnectManager(ctx=ctx, mode='memory') as db:
-        db.cursor.execute(f'''
-            CREATE TABLE {db_table} (
-                Date    DATE        NOT NULL,
-                Field   INTEGER     NOT NULL,
-                PRIMARY KEY (Date)
-            );
-        ''')
-        db.cursor.executemany(f'INSERT INTO {db_table} VALUES (?,?)', rows)
-        try:
-            sql = db.cursor.execute(f"SELECT Field FROM {db_table} WHERE ROWID IN (SELECT max(ROWID) FROM {db_table});")
-            result = sql.fetchone()
-        except Exception as e:
-            print(f"{e}")
-        assert "F3" in result
-
-
-# ===== utils.py tests =====
-
-def test_timeshift_dataframe_columns():
-    pass
 
 def test_write_config_file_work_dir_case(tmp_path):
     # fake config file
@@ -67,7 +28,7 @@ def test_write_config_file_work_dir_case(tmp_path):
         'src_dir': temp_dir
     }
 
-    utils.write_config_file(ctx=ctx)
+    misc.write_config_file(ctx=ctx)
 
     with open(f"{ctx['src_dir']}/config.ini", 'r') as f1:
         result = f1.read()
@@ -90,7 +51,7 @@ def test_create_ohlc_database(tmp_path):
         'ohlc_pool': ['aaa', 'bbb'],
     }
 
-    utils.create_ohlc_database(ctx=ctx)
+    misc.create_ohlc_database(ctx=ctx)
 
     with sqlite3.connect('temp.db') as con:
         cur = con.cursor()
@@ -120,7 +81,7 @@ def test_create_data_line_database(tmp_path):
         'line_pool': ['aaa', 'bbb'],
     }
 
-    utils.create_data_line_database(ctx=ctx)
+    misc.create_data_line_database(ctx=ctx)
 
     with sqlite3.connect('temp.db') as con:
         cur = con.cursor()
