@@ -2,7 +2,6 @@ import click, pytest
 from click.testing import CliRunner
 
 from pkg.srv_scrape import agent
-from pkg.srv_scrape import client
 from pkg.srv_scrape.cli_sc import chart
 
 
@@ -33,6 +32,7 @@ def test_fetch_stockchart_called_with_arg(mocker):
     ctx = click.Context(command=chart, info_name="chart", obj={"debug": True})
     ctx.invoke(chart, arg=arg, opt=opt)
     fetch_stockchart_spy.assert_called_once_with(call_dict)
+
 
 @pytest.mark.skip("42")
 def test_fetch_stockchart_called_without_arg(mocker):

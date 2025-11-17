@@ -39,6 +39,7 @@ classifiers = [
 #dependencies = ["pillow", "python-dotenv", "scikit-learn", "selenium", "tiingo", "yfinance"]
 dependencies = [
   "click", "pillow", "python-dotenv", "selenium", "tiingo", "yfinance",
+  "numpy", "pandas", "scipy",
 ]
 
 [project.optional-dependencies]

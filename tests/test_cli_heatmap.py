@@ -15,7 +15,7 @@ def test_help_option(runner):
     assert "heatmap" in result.output
     assert result.exit_code == 0
 
-@pytest.mark.skip("takes too long")
+@pytest.mark.skip("42")
 def test_fetch_heatmap_called_with_arg(mocker):
     call_dict = {
         'debug': True,
@@ -30,7 +30,7 @@ def test_fetch_heatmap_called_with_arg(mocker):
     fetch_heatmap_spy.assert_called_once_with(call_dict)
 
 
-@pytest.mark.skip("takes too long")
+@pytest.mark.skip("42")
 def test_fetch_heatmap_called_without_arg(mocker):
     call_dict = {
         'debug': True,

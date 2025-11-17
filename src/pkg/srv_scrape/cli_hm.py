@@ -45,13 +45,13 @@ def heatmap(ctx, arg):
         ctx.obj["item_list"] = list(arg)
     else:  # try default arguments
         try:
-            ctx.obj["item_list"] = (config_obj.get(section="chart", option=f"{ctx.info_name}_pool")).split()
+            ctx.obj["item_list"] = (config_obj.get(section="scrape", option=f"{ctx.info_name}_pool")).split()
         except:
             click.echo(f" No default {ctx.info_name} pool is set, try 'stonk-app config --help'\n")
             return
 
     ctx.obj["command"] = ctx.info_name
-    ctx.obj["url"] = config_obj.get(section="chart", option=f"url_{ctx.info_name}")
+    ctx.obj["url"] = config_obj.get(section="scrape", option=f"url_{ctx.info_name}")
     ctx.obj["work_dir"] = config_obj.get(section="config", option="work_dir")
 
     if ctx.obj["debug"]:
