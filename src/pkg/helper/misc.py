@@ -4,11 +4,11 @@ src/pkg/helper/utils.py
 Some misc. helper functions
 
 Functions:
-    create_ohlc_database(): create an sqlite3 database
-    create_signal_database(): create an sqlite3 database
-    write_config_file(): write values to config file
-    write_ohlc_database(): write to sqlite3 database
-    write_signal_database(): write to sqlite3 database
+-    create_ohlc_database(): create an sqlite3 database
+-    create_signal_database(): create an sqlite3 database
+-    write_config_file(): write values to config file
+-    write_ohlc_database(): write to sqlite3 database
+-    write_signal_database(): write to sqlite3 database
 """
 import logging
 
@@ -23,10 +23,13 @@ logger = logging.getLogger(__name__)
 
 def create_ohlc_database(ctx: dict) -> None:
     """
+    create_ohlc_database(ctx: dict)
+    -------------------------------
     Create sqlite3 database. Table for each ticker symbol.
-    Column for open, high, low, close, and volume.
+    Columns for open, high, low, close, and volume.
 
-    :param ctx: Dictionary must have keys; debug, database, and ohlc_pool
+    :param ctx: must have keys; `debug`: bool, `database`: str,
+        and `ohlc_pool`: list
     :type ctx: dict
     :return:
     :rtype: None
@@ -61,10 +64,13 @@ def create_ohlc_database(ctx: dict) -> None:
 
 def create_data_line_database(ctx: dict) -> None:
     """
+    create_data_line_database(ctx: dict)
+    ------------------------------------
     Create sqlite3 database. Table for each ticker symbol.
     Column for each data line.
 
-    :param ctx: Dictionary must have keys; debug, database, line, and line_pool
+    :param ctx: must have keys; `debug`: bool, `database`: str,
+        `line`: str, and `line_pool`: list
     :type ctx: dict
     :return:
     :rtype: None
@@ -110,10 +116,12 @@ def timeshift_dataframe_columns(df, tl: list, sp: int):
 
 def write_config_file(ctx: dict)->None:
     """
+    write_config_file(ctx: dict)
+    ----------------------------
     Write new value to the appropriate config file.
 
-    :param ctx: Dictionary containing command, argument,
-    option, and src_dir path.
+    :param ctx: must have keys; `debug`: bool, `command`: str,
+        `arg`: str, `opt`: str, and `src_dir`: str
     :type ctx: dict
     :return:
     :rtype: None
@@ -147,19 +155,19 @@ def write_config_file(ctx: dict)->None:
 
 def write_ohlc_database(ctx: dict, data_tuple: tuple) -> None:
     """
-    Cast a magical spell using a wand and incantation.
-    This function simulates casting a spell. With no
-    target specified, it is cast into the void.
+    write_ohlc_database(ctx: dict, data_tuple: tuple)
+    -------------------------------------------------
+    Write data to an OHLC database.
 
-    :param wand: The wand used to do the spell-casting deed.
-    :type wand: str
-    :param incantation: The words said to activate the magic.
-    :type incantation: str
-    :param target: The object or person the spell is directed at (optional).
-    :return: A string describing the result of the spell.
-    :rtype: str
+    :param ctx: must have key; `debug`: bool
+    :type ctx: dict
+    :param data_tuple: contains; the ticker symbol
+        and (date, open, high, low, close, volume)
+    :type data_tuple: tuple
+    :return:
+    :rtype: None
 
-    :raises ValueError: If the incantation is unknown or the wand fails to work.
+    :raises Exception:
     """
     if ctx["debug"]:
         logger.debug(f"write_ohlc_database(ctx={ctx}, data_tuple[0]: {data_tuple[0]}, data_tuple[1]:\n{data_tuple[1]})")
@@ -176,19 +184,19 @@ def write_ohlc_database(ctx: dict, data_tuple: tuple) -> None:
 
 def write_signal_database(ctx: dict, data_tuple: tuple) -> None:
     """
-    Cast a magical spell using a wand and incantation.
-    This function simulates casting a spell. With no
-    target specified, it is cast into the void.
+    write_signal_database(ctx: dict, data_tuple: tuple)
+    ---------------------------------------------------
+    Write signal line data to database.
 
-    :param wand: The wand used to do the spell-casting deed.
-    :type wand: str
-    :param incantation: The words said to activate the magic.
-    :type incantation: str
-    :param target: The object or person the spell is directed at (optional).
-    :return: A string describing the result of the spell.
-    :rtype: str
+    :param ctx: must have key; `debug`: bool
+    :type ctx: dict
+    :param data_tuple: contains; the ticker symbol
+        and (value, for, each, item, in, data, line)
+    :type data_tuple: tuple
+    :return:
+    :rtype: None
 
-    :raises ValueError: If the incantation is unknown or the wand fails to work.
+    :raises Exception:
     """
     if ctx["debug"]:
         logger.debug(f"write_signal_database(ctx={ctx}, data_tuple[0]: {data_tuple[0]}, data_tuple[1]:\n{data_tuple[1]})")
@@ -204,7 +212,3 @@ def write_signal_database(ctx: dict, data_tuple: tuple) -> None:
             con.cursor.executemany(f"INSERT INTO {table_name} VALUES (?,?,?,?,?,?)", signal_data_list)
     except con.sqlite3.Error as e:
         logger.debug(f"*** Error *** {e}")
-
-
-# # Create getlist() converter, used for reading ticker symbols
-# config_obj = ConfigParser(allow_no_value=True, converters={"list": lambda x: [i.strip() for i in x.split(",")]})

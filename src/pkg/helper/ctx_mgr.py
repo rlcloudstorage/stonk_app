@@ -3,9 +3,9 @@ src/pkg/helper/ctx_mgr.py
 -------------------------
 All classes inherit from BaseProcessor class
 
-Class:
-    SpinnerManager(): Context manager for CLI spinner object
-    SqliteConnectManager(): Context manager for Sqlite3 database
+Classes:
+-    SpinnerManager(): Context manager for CLI spinner object
+-    SqliteConnectManager(): Context manager for Sqlite3 database
 """
 
 import logging
@@ -16,23 +16,23 @@ logger = logging.getLogger(__name__)
 
 
 class SpinnerManager:
-    """Context manager for CLI spinner object
+    """
+    SpinnerManager(debug: bool, delay: float)
     -----------------------------------------
-    Parameters
-    ----------
-    `debug` : bool
-    `delay` : float
-        default is 0.2\n
-    Returns
-    -------
-    context manager\n
+    Context manager for command line spinner object.
+
+    :param debug: enable debug logger
+    :type debug: bool
+    :param delay: speed of spinner (default is 0.2)
+    :type delay: float
+    :return: spinner context manager
+    :rtype: object
     """
     import sys
     import threading
     from time import sleep
 
     busy = False
-    # delay = 0.2
 
     @staticmethod
     def spinning_cursor():
@@ -72,19 +72,17 @@ class SpinnerManager:
 
 
 class SqliteConnectManager:
-    """Context manager for Sqlite3 database
-    ------------------------------------
-    Commits changes on exit.\n
-    Parameters
-    ----------
-    `ctx` : dict
-        dictionary containing various default settings\n
-    `mode` : string
-        open database for read-only 'ro', read-write 'rw', \n
-        read-write-create 'rwc', or 'memory' for in-memory db\n
-    Returns
-    -------
-    context manager\n
+    """
+    SqliteConnectManager(ctx: dict, mode: str)
+    ------------------------------------------
+    Context manager for Sqlite3 database connections.
+
+    :param ctx: must have keys; `debug`: bool, and `database`: str path to database
+    :type ctx: dict
+    :param mode: options are 'ro', 'rw', 'rwc', or 'memory'
+    :type mode: str
+    :return: database connection manager
+    :rtype: object
     """
     import sqlite3
 
