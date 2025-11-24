@@ -5,12 +5,8 @@ from pkg.srv_scrape import agent
 from pkg.srv_scrape.cli_sc import chart
 
 
-@pytest.fixture(scope="module")
-def runner():
-    return CliRunner()
-
-
-def test_help_option(runner):
+def test_help_option():
+    runner = CliRunner()
     result = runner.invoke(chart, ["--help"])
     assert "chart" in result.output
     assert result.exit_code == 0

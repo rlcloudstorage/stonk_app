@@ -5,15 +5,13 @@ from pkg.srv_scrape import agent
 from pkg.srv_scrape import client
 from pkg.srv_scrape.cli_hm import heatmap
 
-@pytest.fixture(scope="module")
-def runner():
-    return CliRunner()
 
-
-def test_help_option(runner):
+def test_help_option():
+    runner = CliRunner()
     result = runner.invoke(heatmap, ["--help"])
     assert "heatmap" in result.output
     assert result.exit_code == 0
+
 
 @pytest.mark.skip("42")
 def test_fetch_heatmap_called_with_arg(mocker):

@@ -22,7 +22,7 @@ def fetch_ohlc_data(ctx: dict) -> None:
     Returns:
         None:
     """
-    from pkg.helper.utils import create_ohlc_database, write_ohlc_database
+    from pkg.helper.misc import create_ohlc_database, write_ohlc_database
 
     if ctx["debug"]:
         logger.debug(f"fetch_ohlc_data(ctx={ctx} {type(ctx)}")
@@ -60,7 +60,7 @@ def fetch_signal_data(ctx: dict) -> None:
     Returns:
         None:
     """
-    from pkg.helper.utils import create_signal_database, write_signal_database
+    from pkg.helper.misc import create_signal_database, write_signal_database
 
     if ctx["debug"]:
         logger.debug(f"fetch_signal_data(ctx={ctx} {type(ctx)}")

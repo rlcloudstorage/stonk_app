@@ -134,8 +134,11 @@ group.add_command(cmd=backtest, name="backtest")
 from pkg.srv_scrape.cli_sc import chart
 group.add_command(cmd=chart, name="chart")
 
+from pkg.srv_data.cli import data
+group.add_command(cmd=data, name="data")
+
 from pkg.srv_scrape.cli_hm import heatmap
 group.add_command(cmd=heatmap, name="heatmap")
 
-from pkg.srv_data.cli import data
-group.add_command(cmd=data, name="data")
+from pkg.srv_plot.cli import plot
+group.add_command(cmd=plot, name="plot")

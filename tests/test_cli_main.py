@@ -16,6 +16,7 @@ def test_main_cli_group(runner):
     assert "config" in result.output
     assert "data" in result.output
     assert "heatmap" in result.output
+    assert "plot" in result.output
     assert result.exit_code == 0
 
 def test_main_cli_config_work_dir(runner):
@@ -52,4 +53,10 @@ def test_main_cli_heatmap_command(runner):
     # verify all commands present
     result = runner.invoke(group, ["heatmap", "--help"])
     assert "heatmap" in result.output
+    assert result.exit_code == 0
+
+def test_main_cli_plot_command(runner):
+    # verify all commands present
+    result = runner.invoke(group, ["plot", "--help"])
+    assert "plot" in result.output
     assert result.exit_code == 0

@@ -4,16 +4,19 @@ src/pkg/helper/pd_utils.py
 Some misc. Pandas helper functions
 
 Functions:
--    correlate_dataframe_columns(): create the correlation matrix of a dataframe
--    dataframe_from_table_in_database(): create a Pandas dataframe from a database table
--    dataframe_from_one_column_in_all_db_tables(): dataframe from a column common to several tables
--    shift_timeseries_dataframe_columns(): shift columns in dataframe
+-   correlate_dataframe_columns(): create the correlation matrix of a dataframe
+-   dataframe_from_table_in_database(): create a Pandas dataframe from a database table
+-   dataframe_from_one_column_in_all_db_tables(): dataframe from a column common to several tables
+-   savgol_filter_slope_change_signal(): apply a Savitzky-Golay filter to a dataframe
+-   shift_timeseries_dataframe_columns(): shift columns in dataframe
 """
 import logging
 import sqlite3
 
 import numpy as np
 import pandas as pd
+
+from scipy.signal import savgol_filter
 
 
 logger = logging.getLogger(__name__)
@@ -119,6 +122,67 @@ def dataframe_from_one_column_in_all_db_tables(db_path: str, column: str, table_
     return dataframe
 
 
+def savgol_filter_slope_change_signal(dataframe: pd.DataFrame, win_length: int, poly_order: int=2, deriv: int=1):
+    """
+    savgol_filter_slope_change_signal(dataframe, win_length, poly_order, deriv)
+    ---------------------------------------------------------------------------
+    Apply a Savitzky-Golay filter to the dataframe. Determine if derivitave is positive or negative.
+    Sum rows of dataframe.
+
+    :param dataframe: pandas timeseries dataframe
+    :type dataframe: pandas.core.frame.DataFrame
+    :param win_length: length of the filter window
+    :type win_length: int
+    :param poly_order: order of the polynomial used to fit the samples,
+        polyorder must be less than win_length
+    :type poly_order: int
+    :param deriv: order of the derivative to compute.,
+        this must be a nonnegative integer
+    :type deriv: int
+    :return: dataframe with original columns plus `sum` of rows column
+    :rtype: pandas.core.frame.DataFrame
+    """
+    # create empty dataframes with index as a timestamp
+    slope_df = pd.DataFrame(index=dataframe.index.values)
+    slope_df.index.name = "datetime"
+    sig_df = pd.DataFrame(index=dataframe.index.values)
+    sig_df.index.name = "datetime"
+    sig_df.name = f"sig_{dataframe.name}"
+
+    # slope (first derivitive) of filtered timeseries
+    for col in dataframe.columns:
+        slope_df[col] = savgol_filter(
+            x=dataframe[col].values, window_length=win_length,
+            polyorder=poly_order, deriv=deriv
+        )
+
+    for col in slope_df.columns:
+        data = slope_df[col].values
+        zero_list = list()
+
+        for i, cur_item in enumerate(data):
+            prev_item = data[i - 1]
+            if i == 0:
+                # reset starting value
+                zero_list.append(0)
+                continue
+            elif cur_item > 0 and prev_item <= 0:
+                # derivative crosses zero to upside
+                zero_list.append(1)
+            elif cur_item < 0 and prev_item >= 0:
+                # derivative crosses zero to downside
+                zero_list.append(-1)
+            else:
+                # no crossing maintain status
+                zero_list.append(zero_list[i - 1])
+
+        sig_df[f"{col}"] = zero_list
+
+    sig_df["sum"] = sig_df.sum(axis=1).fillna(0)
+
+    return sig_df.astype(int)
+
+
 def shift_timeseries_dataframe_columns(dataframe: pd.DataFrame, col_list: list, period: int) -> pd.DataFrame:
     """
     shift_timeseries_dataframe_columns(dataframe, col_list, period)
@@ -137,6 +201,7 @@ def shift_timeseries_dataframe_columns(dataframe: pd.DataFrame, col_list: list, 
     :rtype: pandas.core.frame.DataFrame
     """
     shift_cols = dataframe.columns[~(dataframe.columns.isin(col_list))]
-    dataframe[shift_cols] = dataframe[shift_cols].shift(periods=period)
+    dataframe[shift_cols] = dataframe[shift_cols].shift(periods=period).fillna(0)
+    # dataframe[shift_cols] = dataframe[shift_cols].shift(periods=period).fillna(dataframe.mean())
 
-    return dataframe
+    return dataframe.astype(int)
